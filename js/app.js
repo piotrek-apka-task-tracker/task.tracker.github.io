@@ -88,6 +88,7 @@ const App = {
             v.classList.remove('active');
         });
         document.getElementById(`${view}-view`).classList.add('active');
+        window.scrollTo(0, 0);
 
         // Refresh view content
         this.refreshView(view);
@@ -147,6 +148,7 @@ const App = {
     
     const loginScreen = document.getElementById('login-screen');
     const gameScreen = document.getElementById('game-screen');
+    window.scrollTo(0, 0);
     
     console.log('Login screen element:', loginScreen);
     console.log('Game screen element:', gameScreen);
@@ -191,6 +193,7 @@ const App = {
     showLoginScreen() {
         document.getElementById('game-screen').classList.remove('active');
         document.getElementById('login-screen').classList.add('active');
+        window.scrollTo(0, 0);
     },
 
     logout() {
