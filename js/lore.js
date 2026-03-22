@@ -1,229 +1,279 @@
-// ============================================
+// ================================
 // LORE & STORY SYSTEM
-// ============================================
-
-const LORE_DATA = [
-    // Prologue (index 0) - unlocked by default
-    {
-        chapter: "Prologue",
-        title: "The Awakening",
-        text: `You awaken in a world between worlds — the Realm of QuestBorne. Here, willpower 
-manifests as physical strength, discipline forges unbreakable armor, and every challenge 
-conquered in the waking world empowers your spirit. You stand before the Eternal Dungeon, 
-an infinite labyrinth that descends into the heart of the earth. Its depths are filled with 
-creatures born from entropy — manifestations of procrastination, doubt, and chaos. The ancient 
-guardian at the gate speaks: "Only through mastering yourself can you descend deeper. No blade 
-forged in darkness can replace the power of a disciplined soul." Your journey begins now.`
-    },
-    // Floor 1 Boss (index 1)
-    {
-        chapter: "Chapter I",
-        title: "The Whispering Caves",
-        text: `Deep within the first caverns, you encounter Grukk the Idle — a massive cave troll 
-who has sat motionless for a thousand years, growing fat on the stagnation of those who 
-wandered in and gave up. His very presence saps motivation, making your limbs heavy and 
-your mind foggy. But you push through. As Grukk falls, his body crumbles to reveal a 
-crystallized heart — proof that even the most stubborn inertia can be shattered. On the 
-wall behind him, ancient runes glow: "The first step is always the hardest. You have taken it."`
-    },
-    // Floor 2 Boss (index 2)
-    {
-        chapter: "Chapter II",
-        title: "The Echoing Halls",
-        text: `The second floor opens into vast halls of black marble, where every sound echoes 
-infinitely. Here dwells the Doubt Wraith — a spectral figure that whispers your failures 
-back to you in your own voice. "Remember when you quit? Remember when you weren't good enough?" 
-Its attacks are not physical but psychological, each hit making you question why you even 
-descended into the dungeon. But you've built resilience through daily discipline. You've 
-proven yourself through action, not words. The wraith screams as your conviction tears 
-through its ethereal form. In the silence that follows, you find a journal entry from a 
-previous adventurer: "The voices never truly stop, but they become quieter the louder your 
-actions speak."`
-    },
-    // Floor 3 Boss (index 3)
-    {
-        chapter: "Chapter III",
-        title: "The Forge of Broken Promises",
-        text: `The third floor burns with the heat of a thousand abandoned commitments. Here, in 
-a forge fueled by broken promises, works Kalthraz the Oathbreaker — a demon-smith who 
-crafts weapons from failed resolutions and shields from excuses. The floor is littered 
-with half-finished swords and cracked armor — the remnants of those who started strong 
-but could not maintain their resolve. Kalthraz laughs as you approach: "Another one who 
-thinks they're different?" But you ARE different. Every task completed, every habit maintained, 
-has been a promise KEPT. Your consistency is your ultimate weapon. As Kalthraz falls, 
-his forge transforms — no longer burning with failure, but glowing with potential. You 
-claim a weapon forged from your own determination.`
-    },
-    // Floor 4 Boss (index 4)
-    {
-        chapter: "Chapter IV",
-        title: "The Garden of Endless Scrolling",
-        text: `You descend into a bizarre floor — an infinite garden where flowers bloom into 
-glowing screens, each showing something fascinating, something that demands "just five 
-more minutes." The guardian here is Scrollos, the Infinite — a serpentine creature made 
-entirely of tangled notification threads and algorithm chains. It doesn't attack directly; 
-instead, it shows you interesting things, funny things, outrage-inducing things — anything 
-to keep you standing still while hours dissolve into nothing. You've seen this enemy before 
-in the waking world. Every time you chose to put down the phone, every time you chose 
-practice over consumption, you were training for this fight. Scrollos unravels as you 
-refuse its offerings, and beneath its coils you find an artifact pulsing with reclaimed time.`
-    },
-    // Floor 5 Boss (index 5)
-    {
-        chapter: "Chapter V",
-        title: "The Mirror Labyrinth",
-        text: `The fifth floor is a maze of mirrors, each reflecting a different version of you — 
-the you who never started, the you who gave up, the you who chose comfort over growth. 
-At its center waits your Shadow Self, an exact copy of you but twisted by every compromise 
-and shortcut you ever took. It knows all your moves because it IS you — or rather, it's 
-who you would have been without discipline. The battle is the hardest yet, because your 
-Shadow matches you blow for blow. But there's one crucial difference: your Shadow can 
-only mirror your past self. Every new skill gained, every stat improved through real effort, 
-gives you the edge. When it finally shatters, you see your true reflection for the first 
-time — scarred, tired, but unbroken. The inscription reads: "Your greatest enemy was 
-always yourself. Your greatest ally is who you chose to become."`
-    },
-    // Floor 6 Boss (index 6)
-    {
-        chapter: "Chapter VI",
-        title: "The Procrastination Swamp",
-        text: `Below the Mirror Labyrinth lies a vast, treacherous swamp where time moves strangely. 
-What feels like minutes turns out to be hours, and the thick fog makes every direction 
-look the same. The master of this domain is Manyana, the Tomorrow Witch — a haggard 
-figure who eternally promises to start tomorrow. Her magic is seductive: "Rest now, hero. 
-You've earned it. Tomorrow you'll be stronger, more prepared." Her spells don't damage 
-your body but slow your mind, making every action feel like it can wait. You've fought 
-this battle countless times in the waking world. Every morning you chose to begin despite 
-not feeling ready, you were building immunity to her curse. As she falls, the swamp 
-drains, revealing solid ground beneath — it was always there, hidden by the fog of delay.`
-    },
-    // Floor 7 Boss (index 7)
-    {
-        chapter: "Chapter VII",
-        title: "The Perfectionist's Tower",
-        text: `A gleaming tower rises from the dungeon's depths — impossibly perfect in its 
-construction, every brick precisely placed, every surface polished to a mirror shine. 
-At its peak waits Flawless, the Unfinished — a being of pure crystal that has spent 
-eternity perfecting a single room while the rest of its tower crumbles from neglect. 
-Its attacks are surgical and precise, each one designed to exploit the smallest weakness 
-in your form. But perfection is its prison, not its power. While it calculated the 
-mathematically optimal strike, you simply struck. While it hesitated because conditions 
-weren't perfect, you acted with what you had. Flawless shatters — not because you were 
-perfect, but because you were persistent. In its remains you find a note: "Done is better 
-than perfect. Consistent beats exceptional. Progress over perfection, always."`
-    },
-    // Floor 8 Boss (index 8)
-    {
-        chapter: "Chapter VIII",
-        title: "The Comfort Catacombs",
-        text: `The eighth floor is warm and cozy — disturbingly so. Soft couches line the walls, 
-gentle music plays, and the air smells of home cooking. This is the domain of Kozyrak, 
-the Comfort Dragon — a massive beast that doesn't breathe fire but warmth, doesn't 
-threaten with claws but wraps you in velvet wings. "Stay," it purrs. "Why struggle? 
-Why push yourself? Everything you need is right here." Its lair is filled with the 
-preserved remains of adventurers who chose comfort — eternally resting, eternally 
-unchanging, eternally unfulfilled. You recognize the trap because you've escaped it 
-before. Every cold morning you chose to exercise, every evening you practiced instead 
-of relaxing — those were victories against this very creature. Kozyrak doesn't roar 
-when defeated; it sighs, and its warmth transforms into a forge-fire that tempers 
-your resolve into steel.`
-    },
-    // Floor 9 Boss (index 9)
-    {
-        chapter: "Chapter IX",
-        title: "The Comparison Colosseum",
-        text: `An enormous arena stretches before you, its stands filled with ghostly spectators — 
-each one a version of someone you've compared yourself to. Someone more talented, 
-more successful, more disciplined. They whisper and point and judge. The champion of 
-this arena is Envius Rex, a shape-shifting gladiator who constantly morphs into someone 
-better than you at whatever you're trying to do. Faster, stronger, smarter — always one 
-step ahead, always making you feel inadequate. But you've learned the truth: comparison 
-is a rigged game with no winners. Your journey is your own. Your progress is measured 
-against your yesterday, not someone else's today. When you stop trying to be better 
-than Envius and simply focus on being better than you were, it loses its power — because 
-it can only copy others, never generate its own strength. The arena crumbles, and beneath 
-it you find a trophy inscribed: "The only race worth running is against who you were yesterday."`
-    },
-    // Floor 10 Boss (index 10)
-    {
-        chapter: "Chapter X",
-        title: "The Void Gate",
-        text: `At the tenth floor, the dungeon opens into a vast void — an infinite darkness broken 
-only by a single point of golden light. Here, at the boundary between the known and 
-unknown, waits the Void Sentinel — an ancient guardian neither good nor evil, but a test 
-of everything you've become. It doesn't speak, doesn't taunt, doesn't deceive. It simply 
-fights with the accumulated power of ten floors of darkness. The battle is long and 
-grueling, testing every stat, every skill, every artifact you've earned. And when 
-it finally falls, the void doesn't brighten — instead, you realize that the light 
-was coming from YOU all along. The golden glow was your own discipline made manifest. 
-A gateway opens to deeper floors, and a voice echoes: "You have passed the first trial. 
-But the Eternal Dungeon has no end, as your potential for growth has no ceiling. 
-Descend further, grow stronger, become the legend you were meant to be." 
-The real journey begins now.`
-    }
-];
-
-// Generate infinite lore for floors beyond 10
-function generateLore(floorNumber) {
-    if (floorNumber <= 10 && floorNumber < LORE_DATA.length) {
-        return LORE_DATA[floorNumber];
-    }
-
-    // Procedural lore generation for floors beyond the pre-written content
-    const themes = [
-        { name: "The Shattered Timeline", enemy: "Chronos, the Time Eater", 
-          text: "In a realm where past and future collide, you face a creature that feeds on wasted time. Every second squandered in the waking world gave it power, but every productive hour weakened its hold. Your discipline across time itself becomes your weapon." },
-        { name: "The Burnout Wastes", enemy: "Ashara, Flame of Excess",
-          text: "A scorched landscape where overwork burns as hot as laziness freezes. The guardian here teaches a different lesson — that rest is not weakness, and balance is the sharpest blade. You defeat it not with force alone, but with the wisdom of knowing when to push and when to recover." },
-        { name: "The Echo Chamber", enemy: "Narcissus, the Self-Deceiver",
-          text: "A hall where only your own voice echoes back, amplified and distorted. The creature here feeds on self-deception — the lies we tell ourselves about our progress, our abilities, our commitment. Only honest self-reflection can pierce its defenses." },
-        { name: "The Gravity Well", enemy: "Heavius, the Burden Lord",
-          text: "Every responsibility, every obligation, every 'should' materializes as physical weight on this floor. The guardian is made of accumulated pressure. You learn that carrying burdens isn't about strength alone — it's about prioritization, delegation, and the courage to set down what doesn't serve you." },
-        { name: "The Distortion Fields", enemy: "Parallax, the Perspective Shifter",
-          text: "Reality bends on this floor — what seems close is far, what seems easy is hard, and vice versa. The guardian distorts your perception, making small victories feel meaningless and minor setbacks feel catastrophic. Defeating it requires maintaining clarity of purpose regardless of circumstances." },
-        { name: "The Forgotten Library", enemy: "Amnesia, the Knowledge Thief",
-          text: "An infinite library where books write themselves and erase just as quickly. The guardian steals not memories, but lessons learned — making you repeat the same mistakes. Only by truly internalizing your growth can you resist its power." },
-        { name: "The Jealousy Mines", enemy: "Covetous Rex, the Green Dragon",
-          text: "Deep mines where crystals reflect others' achievements, making your own seem dim by comparison. The dragon hoards not gold but others' accomplishments, using them as weapons. You learn that admiration can fuel growth, but jealousy only poisons it." },
-        { name: "The Anxiety Maze", enemy: "The What-If Hydra",
-          text: "A maze that changes based on your fears, with a hydra that grows two heads for every worry you feed. The only path through is forward — not avoiding anxiety, but acting despite it. Each head you cut with decisive action stays severed." },
-        { name: "The Monotony Plains", enemy: "The Grey Sovereign",
-          text: "An endless, featureless plain where everything is exactly the same. The guardian thrives on boredom and routine's dark side — when discipline becomes joyless obligation. You defeat it by finding purpose within consistency, meaning within repetition." },
-        { name: "The Pride Pinnacle", enemy: "Hubris, the Fallen Champion",
-          text: "A mountain peak where a once-great hero fell to arrogance. The guardian is what you could become if you let achievements go to your head — powerful but brittle, confident but blind. True strength lies in the humility to keep learning, keep growing, keep beginning again." }
-    ];
-
-    const themeIndex = (floorNumber - 11) % themes.length;
-    const cycle = Math.floor((floorNumber - 11) / themes.length) + 1;
-    const theme = themes[themeIndex];
-
-    return {
-        chapter: `Chapter ${toRomanNumerals(floorNumber)}`,
-        title: cycle > 1 ? `${theme.name} (Cycle ${cycle})` : theme.name,
-        text: cycle > 1 
-            ? `${theme.text}\n\nIn this deeper cycle, ${theme.enemy} returns more powerful than before, twisted by the accumulated darkness of ${(cycle - 1) * 10} additional floors. Yet you too have grown. The battle is fiercer, the stakes higher, but the lesson remains eternal.`
-            : theme.text
-    };
-}
-
-function toRomanNumerals(num) {
-    const romanNumerals = [
-        [1000, 'M'], [900, 'CM'], [500, 'D'], [400, 'CD'],
-        [100, 'C'], [90, 'XC'], [50, 'L'], [40, 'XL'],
-        [10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']
-    ];
-    let result = '';
-    for (const [value, symbol] of romanNumerals) {
-        while (num >= value) {
-            result += symbol;
-            num -= value;
+// ================================
+const LoreSystem = {
+    // The Chronicle of Shadows - An ever-expanding fantasy saga
+    chapters: [
+        {
+            floor: 1,
+            title: "The Awakening Beneath",
+            text: "In the age before memory, when the world of Aethermoor was young, the first shadows crept from the cracks between realms. You awaken in the Sunken Vestibule—a forgotten chamber beneath the ruins of Valdris Keep. The air tastes of ancient dust and fading enchantments. Upon the wall, faded glyphs pulse with a dying light, and you realize with sudden clarity: you were summoned here. Not by chance, but by the desperate will of a world unraveling. The Shard of Dawn, first of many fragments of the shattered Eternis Crystal, lies before you, guarded by the Hollow Sentinel—a suit of armor animated by lingering sorrow.",
+            bossName: "The Hollow Sentinel",
+            bossEmoji: "🛡️",
+            artifactName: "Shard of Dawn",
+            artifactIcon: "💎",
+            artifactDesc: "A crystalline fragment that glows with the first light of creation.",
+            artifactBonus: { attack: 3, defense: 1 }
+        },
+        {
+            floor: 2,
+            title: "Whispers of the Fungal Deep",
+            text: "Below the vestibule, the earth opens into the Mycelium Caverns—a labyrinth of bioluminescent fungi and whispering spores. The walls breathe, and the mushrooms hum an ancient lullaby that nearly lulls you to sleep. Here, the Sporelord Xytha holds dominion, a creature born from the nightmares of the forest above when the Eternis Crystal shattered. Xytha speaks in riddles: 'The world above rots because the light was broken. You carry a shard, little flame. Will you gather them all, or will you too become compost for my garden?' The battle is fierce, but within Xytha's remains you find another truth—and another fragment of power.",
+            bossName: "Sporelord Xytha",
+            bossEmoji: "🍄",
+            artifactName: "Fungal Crown",
+            artifactIcon: "👑",
+            artifactDesc: "A living crown of luminescent mushrooms that enhances perception.",
+            artifactBonus: { attack: 2, magic: 3 }
+        },
+        {
+            floor: 3,
+            title: "The Drowned Library",
+            text: "Water seeps through every crack as you descend into what was once the Grand Library of the Mage-King Thovren. Shelves of waterlogged tomes stretch endlessly, their knowledge bleeding into the rising waters. Ghostly scholars still wander the aisles, trapped in loops of study, unable to accept that their world ended centuries ago. The Archivist, a specter of immense intellect twisted by grief, guards the Quill of Binding—an artifact that can rewrite small portions of reality. 'Knowledge without wisdom,' the Archivist rasps, 'is what shattered the crystal in the first place. The Mage-King sought to know everything and understood nothing.'",
+            bossName: "The Archivist",
+            bossEmoji: "👻",
+            artifactName: "Quill of Binding",
+            artifactIcon: "🪶",
+            artifactDesc: "A spectral quill that can inscribe protection runes on the bearer's skin.",
+            artifactBonus: { defense: 4, magic: 2 }
+        },
+        {
+            floor: 4,
+            title: "Forge of the Broken Oath",
+            text: "The temperature rises as you enter the ancient dwarven Forge of Khuldran. Once, the greatest weapons in Aethermoor were crafted here—including the very blade that struck the Eternis Crystal. The forge still burns with guilt-fire, a flame that feeds on broken promises. Dwarven automatons patrol the halls, endlessly hammering at anvils, trying to forge a weapon that could undo their ancestors' mistake. At the forge's heart stands Grothek the Oathbreaker, the ghost of the dwarf who forged the Shattering Blade. He fights not to defeat you, but to test if you are worthy of forgiveness.",
+            bossName: "Grothek the Oathbreaker",
+            bossEmoji: "⚒️",
+            artifactName: "Ember of Guilt",
+            artifactIcon: "🔥",
+            artifactDesc: "A never-dying flame that burns hotter when wielded with conviction.",
+            artifactBonus: { attack: 5, speed: 2 }
+        },
+        {
+            floor: 5,
+            title: "Garden of Stone Dreams",
+            text: "The fifth level reveals an impossible sight: a garden of petrified trees and crystallized flowers, beautiful and terrible. This was once the Everbloom—a garden maintained by the nature spirits of Aethermoor. When the crystal shattered, the garden's magic went wild, turning everything it touched to stone, preserving beauty while destroying life. The Petrified Dryad, last guardian of the Everbloom, weeps tears of granite. She begs for release from her eternal vigil. In defeating her—gently, mercifully—you free her spirit, and she gifts you a seed of impossible hope.",
+            bossName: "The Petrified Dryad",
+            bossEmoji: "🌿",
+            artifactName: "Seed of Rebirth",
+            artifactIcon: "🌱",
+            artifactDesc: "A tiny seed that pulses with the promise of renewal and regeneration.",
+            artifactBonus: { defense: 3, maxHP: 25 }
+        },
+        {
+            floor: 6,
+            title: "The Clockwork Abyss",
+            text: "Gears the size of houses turn in the darkness. You have entered the Temporal Mechanism—a device built by the Mage-King to control time itself. It was his grandest folly. The mechanism still runs, creating pockets where time flows backward, forward, or not at all. Creatures trapped in temporal loops attack without understanding why. At the center, the Chronophage—a being that devours moments—has grown fat on stolen seconds. It speaks with the voices of everyone whose time it has eaten: 'Every moment you waste feeds me. Every hour lost to hesitation makes me stronger. Show me that your moments have meaning.'",
+            bossName: "The Chronophage",
+            bossEmoji: "⏰",
+            artifactName: "Hourglass of Purpose",
+            artifactIcon: "⏳",
+            artifactDesc: "An hourglass where sand flows upward, granting clarity of purpose.",
+            artifactBonus: { speed: 5, crit: 3 }
+        },
+        {
+            floor: 7,
+            title: "The Choir of Chains",
+            text: "The seventh floor resonates with music—discordant, painful, and hauntingly beautiful. Chains hang from the ceiling like harp strings, and imprisoned souls provide the vocals for an eternal, tortured symphony. This was the prison of the Mage-King, where he kept those who opposed his quest for omniscience. The Warden of Chains, a being made entirely of interlocking shackles, conducts this orchestra of suffering with genuine artistic passion. It does not see cruelty in its work—only art. Your battle against it is as much a philosophical argument as a physical confrontation. When the Warden falls, the chains shatter, and the freed souls sing one pure note of gratitude that heals wounds you didn't know you carried.",
+            bossName: "The Warden of Chains",
+            bossEmoji: "⛓️",
+            artifactName: "Resonance Bell",
+            artifactIcon: "🔔",
+            artifactDesc: "A silver bell whose ring shatters illusions and strengthens resolve.",
+            artifactBonus: { attack: 3, defense: 3, magic: 2 }
+        },
+        {
+            floor: 8,
+            title: "Mirror of the Fractured Self",
+            text: "The eighth level is a maze of mirrors, each reflecting a different version of you—who you could have been, who you fear becoming, who you were in lives unlived. The Mirror Wraith is not a separate entity but a dark reflection of yourself, wielding every weakness you've ever hidden, every doubt you've ever whispered in the small hours. It knows your fears because they are its substance. It knows your failures because it was born from them. The battle forces you to confront everything you've avoided. Victory comes not from strength alone, but from acceptance. When the Mirror Wraith shatters, you see clearly—perhaps for the first time.",
+            bossName: "The Mirror Wraith",
+            bossEmoji: "🪞",
+            artifactName: "Lens of Truth",
+            artifactIcon: "🔍",
+            artifactDesc: "A crystal monocle that reveals hidden truths and grants insight in battle.",
+            artifactBonus: { crit: 5, magic: 3, attack: 2 }
+        },
+        {
+            floor: 9,
+            title: "The Feast of Shadows",
+            text: "A great banquet hall stretches before you, tables laden with food that smells divine but turns to ash on the tongue. Shadow courtiers dance an endless waltz, their forms flickering between beauty and horror. This is the court of the Shadow Prince, a fragment of darkness given form when the Eternis Crystal's light shattered. The Shadow Prince is charming, witty, and utterly without substance. He offers you everything—power, knowledge, rest—and means none of it. 'Why struggle?' he whispers. 'The comfortable darkness asks nothing of you. No effort, no growth, no risk of failure.' His words are the sweetest poison, and his defeat requires rejecting the easiest path.",
+            bossName: "The Shadow Prince",
+            bossEmoji: "🌑",
+            artifactName: "Mantle of Resolve",
+            artifactIcon: "🧥",
+            artifactDesc: "A cloak woven from conquered shadows that shields against despair.",
+            artifactBonus: { defense: 5, maxHP: 30, speed: 2 }
+        },
+        {
+            floor: 10,
+            title: "The First Convergence",
+            text: "The tenth floor is a vast chamber where threads of light converge from the shards you've collected. Here, at the First Nexus, the true scope of your quest reveals itself. The dungeon is not merely deep—it is infinite, reaching down into the very foundations of reality. The Nexus Guardian, a being of pure crystallized will, tests whether you have the determination to continue. It shows you visions: thousands more floors, each with greater challenges, each hiding another piece of the shattered crystal. The world above grows darker with each passing day. 'The journey never ends,' the Guardian intones. 'That is both the curse and the gift. Will you continue knowing there is no final destination—only the path?' You raise your weapon. The answer was never in doubt.",
+            bossName: "The Nexus Guardian",
+            bossEmoji: "💫",
+            artifactName: "Heart of the Nexus",
+            artifactIcon: "💠",
+            artifactDesc: "A pulsing crystal core that connects all shards and amplifies their power.",
+            artifactBonus: { attack: 5, defense: 5, magic: 5, maxHP: 50 }
         }
-    }
-    return result;
-}
+    ],
 
-// Export for use in other files
-window.LoreSystem = {
-    getLore: generateLore,
-    LORE_DATA: LORE_DATA
+    // Generate procedural lore for floors beyond the written chapters
+    generateProceduralLore(floor) {
+        const themes = [
+            { name: "The Abyssal", type: "depths", elements: ["darkness", "pressure", "forgotten things"] },
+            { name: "The Burning", type: "fire", elements: ["flame", "ash", "rebirth"] },
+            { name: "The Frozen", type: "ice", elements: ["crystal", "preservation", "silence"] },
+            { name: "The Living", type: "organic", elements: ["growth", "mutation", "hunger"] },
+            { name: "The Void", type: "nothing", elements: ["emptiness", "potential", "fear"] },
+            { name: "The Radiant", type: "light", elements: ["blinding truth", "purification", "revelation"] },
+            { name: "The Mechanical", type: "construct", elements: ["precision", "purpose", "obsolescence"] },
+            { name: "The Dream", type: "psychic", elements: ["illusion", "memory", "desire"] },
+            { name: "The Storm", type: "elemental", elements: ["chaos", "power", "unpredictability"] },
+            { name: "The Ancient", type: "time", elements: ["wisdom", "decay", "cycles"] }
+        ];
+
+        const locations = [
+            "Sanctum", "Depths", "Halls", "Caverns", "Chambers", "Throne Room",
+            "Labyrinth", "Catacombs", "Observatory", "Armory", "Chapel", "Arena",
+            "Vault", "Garden", "Workshop", "Dungeon", "Spire", "Ruins"
+        ];
+
+        const bossTypes = [
+            { prefix: "Elder", suffix: "Lord", emoji: "👹" },
+            { prefix: "Corrupted", suffix: "Knight", emoji: "⚔️" },
+            { prefix: "Ancient", suffix: "Wyrm", emoji: "🐉" },
+            { prefix: "Phantom", suffix: "King", emoji: "👑" },
+            { prefix: "Infernal", suffix: "Beast", emoji: "😈" },
+            { prefix: "Celestial", suffix: "Fallen", emoji: "😇" },
+            { prefix: "Primordial", suffix: "Horror", emoji: "🦑" },
+            { prefix: "Undying", suffix: "Revenant", emoji: "💀" },
+            { prefix: "Storm", suffix: "Titan", emoji: "⛈️" },
+            { prefix: "Crystal", suffix: "Golem", emoji: "🤖" }
+        ];
+
+        const artifactTypes = [
+            { name: "Blade", icon: "⚔️", mainStat: "attack" },
+            { name: "Shield", icon: "🛡️", mainStat: "defense" },
+            { name: "Ring", icon: "💍", mainStat: "magic" },
+            { name: "Amulet", icon: "📿", mainStat: "maxHP" },
+            { name: "Gauntlet", icon: "🧤", mainStat: "attack" },
+            { name: "Helm", icon: "⛑️", mainStat: "defense" },
+            { name: "Staff", icon: "🪄", mainStat: "magic" },
+            { name: "Boots", icon: "👢", mainStat: "speed" },
+            { name: "Orb", icon: "🔮", mainStat: "crit" },
+            { name: "Tome", icon: "📖", mainStat: "magic" }
+        ];
+
+        const seededRandom = (seed) => {
+            let x = Math.sin(seed * 9301 + 49297) * 49297;
+            return x - Math.floor(x);
+        };
+
+        const pick = (arr, seed) => arr[Math.floor(seededRandom(seed) * arr.length)];
+
+        const theme = pick(themes, floor * 7);
+        const location = pick(locations, floor * 13);
+        const boss = pick(bossTypes, floor * 17);
+        const artifact = pick(artifactTypes, floor * 23);
+
+        const adjectives = ["Shattered", "Eternal", "Cursed", "Blessed", "Forgotten", "Twisted", "Sacred", "Unholy", "Ancient", "Awakened"];
+        const adj = pick(adjectives, floor * 31);
+
+        const tierMultiplier = Math.floor(floor / 10) + 1;
+        const baseBonus = Math.floor(floor * 0.8) + 2;
+
+        const bonuses = {};
+        bonuses[artifact.mainStat] = baseBonus + tierMultiplier;
+        
+        const secondaryStat = ['attack', 'defense', 'magic', 'speed', 'crit', 'maxHP'].filter(s => s !== artifact.mainStat);
+        bonuses[pick(secondaryStat, floor * 41)] = Math.floor(baseBonus * 0.6) + tierMultiplier;
+
+        const storyTemplates = [
+            `Floor ${floor} of the Endless Dungeon reveals ${theme.name} ${location}—a place where ${theme.elements[0]} and ${theme.elements[1]} intertwine in maddening patterns. The deeper you descend, the more the dungeon feels alive, responding to your presence with equal parts curiosity and malice. Fragments of the Eternis Crystal pulse stronger here, drawing ${theme.elements[2]} from the walls like blood from a wound. The ${boss.prefix} ${boss.suffix} awaits at the chamber's heart, a being forged from the dungeon's deepest ${theme.elements[0]}. It speaks a challenge that resonates in your bones: 'You have come far, bearer of shards. But distance traveled means nothing—only the distance yet to go.'`,
+            `The walls of floor ${floor} weep with ${theme.elements[1]}. You have entered the ${adj} ${location}, a realm where the boundary between ${theme.elements[0]} and ${theme.elements[2]} has dissolved completely. Echoes of previous adventurers' footsteps still sound in the corridors—or perhaps those are your own steps, bouncing back from a future that hasn't happened yet. The ${boss.prefix} ${boss.suffix} does not attack immediately. It studies you, measuring the weight of your determination against the gravity of your doubts. When it finally strikes, it does so with the force of every abandoned dream and every broken resolution.`,
+            `They called this place the ${adj} ${location} in the old texts, though no text could capture the ${theme.elements[0]} that permeates every stone. Floor ${floor} challenges not just your strength but your understanding of why you fight. The ${boss.prefix} ${boss.suffix}, ancient beyond measure, has watched civilizations rise and crumble from this very spot. 'Another seeker,' it rumbles. 'They all come seeking something—power, meaning, escape. What do you seek, little hero? And is it worth what the dungeon will take from you?' The answer, you've learned, is always yes. The answer is always to keep going.`
+        ];
+
+        return {
+            floor: floor,
+            title: `${theme.name} ${location}`,
+            text: pick(storyTemplates, floor * 53),
+            bossName: `${boss.prefix} ${boss.suffix}`,
+            bossEmoji: boss.emoji,
+            artifactName: `${adj} ${artifact.name} of the ${theme.name.replace('The ', '')}`,
+            artifactIcon: artifact.icon,
+            artifactDesc: `An artifact infused with the essence of ${theme.elements[0]}, recovered from floor ${floor} of the Endless Dungeon.`,
+            artifactBonus: bonuses
+        };
+    },
+
+    // Get lore for a specific floor
+    getLore(floor) {
+        if (floor <= this.chapters.length) {
+            return this.chapters[floor - 1];
+        }
+        return this.generateProceduralLore(floor);
+    },
+
+    // Get monster data for a floor room (non-boss)
+    getMonster(floor, room) {
+        const monsters = [
+            { name: "Shadow Wisp", emoji: "👤", tier: 1 },
+            { name: "Bone Crawler", emoji: "🦴", tier: 1 },
+            { name: "Fungal Creeper", emoji: "🍄", tier: 1 },
+            { name: "Stone Gargoyle", emoji: "🗿", tier: 2 },
+            { name: "Flame Imp", emoji: "🔥", tier: 2 },
+            { name: "Frost Wraith", emoji: "❄️", tier: 2 },
+            { name: "Venomous Drake", emoji: "🐍", tier: 3 },
+            { name: "Iron Golem", emoji: "🤖", tier: 3 },
+            { name: "Dark Sorcerer", emoji: "🧙", tier: 3 },
+            { name: "Abyssal Stalker", emoji: "👁️", tier: 4 },
+            { name: "Thunder Elemental", emoji: "⚡", tier: 4 },
+            { name: "Plague Bearer", emoji: "☠️", tier: 4 },
+            { name: "Void Spawn", emoji: "🌀", tier: 5 },
+            { name: "Elder Vampire", emoji: "🧛", tier: 5 },
+            { name: "Chaos Knight", emoji: "♞", tier: 5 }
+        ];
+
+        const scaledTier = Math.min(Math.floor((floor - 1) / 2) + 1, 5);
+        const available = monsters.filter(m => m.tier <= scaledTier);
+        
+        const seed = floor * 100 + room;
+        const seededRandom = (s) => {
+            let x = Math.sin(s * 9301 + 49297) * 49297;
+            return x - Math.floor(x);
+        };
+        
+        const monster = available[Math.floor(seededRandom(seed) * available.length)];
+        const levelScale = 1 + (floor - 1) * 0.3 + room * 0.1;
+        
+        return {
+            name: monster.name,
+            emoji: monster.emoji,
+            hp: Math.floor(40 * levelScale),
+            maxHP: Math.floor(40 * levelScale),
+            attack: Math.floor(8 * levelScale),
+            defense: Math.floor(3 * levelScale),
+            speed: Math.floor(5 + floor * 0.5),
+            xpReward: 0 // No XP from monsters
+        };
+    },
+
+    // Get boss data for a floor
+    getBoss(floor) {
+        const lore = this.getLore(floor);
+        const levelScale = 1 + (floor - 1) * 0.5;
+        
+        return {
+            name: lore.bossName,
+            emoji: lore.bossEmoji,
+            hp: Math.floor(100 * levelScale),
+            maxHP: Math.floor(100 * levelScale),
+            attack: Math.floor(15 * levelScale),
+            defense: Math.floor(8 * levelScale),
+            speed: Math.floor(8 + floor * 0.8),
+            isBoss: true,
+            floor: floor,
+            lore: lore
+        };
+    }
 };
