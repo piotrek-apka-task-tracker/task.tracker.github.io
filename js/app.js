@@ -143,21 +143,50 @@ const App = {
     },
 
     showGameScreen() {
-        document.getElementById('login-screen').classList.remove('active');
-        document.getElementById('game-screen').classList.add('active');
-        
-        // Get display name from users
-        const users = Auth.getUsers();
-        const displayName = users[this.currentUser]?.username || this.currentUser;
-        document.getElementById('user-display').textContent = displayName;
-        
-        // Initialize all modules
-        Character.init();
-        Tasks.init();
-        Dungeon.init();
-        
-        this.renderDashboard();
-    },
+    console.log('showGameScreen() called');
+    
+    const loginScreen = document.getElementById('login-screen');
+    const gameScreen = document.getElementById('game-screen');
+    
+    console.log('Login screen element:', loginScreen);
+    console.log('Game screen element:', gameScreen);
+    
+    if (!loginScreen) {
+        console.error('ERROR: login-screen element not found!');
+        return;
+    }
+    if (!gameScreen) {
+        console.error('ERROR: game-screen element not found!');
+        return;
+    }
+    
+    loginScreen.classList.remove('active');
+    gameScreen.classList.add('active');
+    
+    console.log('Login screen classes:', loginScreen.className);
+    console.log('Game screen classes:', gameScreen.className);
+    
+    // Get display name from users
+    const users = Auth.getUsers();
+    const displayName = users[this.currentUser]?.username || this.currentUser;
+    
+    const userDisplay = document.getElementById('user-display');
+    if (userDisplay) {
+        userDisplay.textContent = displayName;
+    }
+    
+    console.log('Initializing modules...');
+    
+    // Initialize all modules
+    Character.init();
+    Tasks.init();
+    Dungeon.init();
+    
+    console.log('Rendering dashboard...');
+    this.renderDashboard();
+    
+    console.log('showGameScreen() complete');
+},
 
     showLoginScreen() {
         document.getElementById('game-screen').classList.remove('active');
