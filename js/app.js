@@ -1,0 +1,212 @@
+// ================================
+// Main Application Controller
+// ================================
+
+const App = {
+    currentUser: null,
+    currentView: 'dashboard',
+
+    init() {
+        this.checkAuth();
+        this.bindEvents();
+    },
+
+    checkAuth() {
+        const savedUser = localStorage.getItem('questforge_current_user');
+        if (savedUser) {
+            this.currentUser = savedUser;
+            Auth.loadUserData(this.currentUser);
+            this.showGameScreen();
+        }
+    },
+
+    bindEvents() {
+        // Navigation
+        document.querySelectorAll('.nav-btn, .mobile-nav-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const view = e.currentTarget.dataset.view;
+                this.switchView(view);
+            });
+        });
+
+        // Logout
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            this.logout();
+        });
+
+        // Modal close on overlay click
+        document.getElementById('modal-overlay').addEventListener('click', (e) => {
+            if (e.target.id === 'modal-overlay') {
+                this.closeModal();
+            }
+        });
+
+        // Escape key to close modal
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                this.closeModal();
+            }
+        });
+    },
+
+    switchView(view) {
+        this.currentView = view;
+
+        // Update nav buttons
+        document.querySelectorAll('.nav-btn, .mobile-nav-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.view === view);
+        });
+
+        // Update views
+        document.querySelectorAll('.view').forEach(v => {
+            v.classList.remove('active');
+        });
+        document.getElementById(`${view}-view`).classList.add('active');
+
+        // Refresh view content
+        this.refreshView(view);
+    },
+
+    refreshView(view) {
+        switch(view) {
+            case 'dashboard':
+                this.renderDashboard();
+                break;
+            case 'tasks':
+                Tasks.render();
+                break;
+            case 'character':
+                Character.render();
+                break;
+            case 'dungeon':
+                Dungeon.render();
+                break;
+        }
+    },
+
+    renderDashboard() {
+        // Quick character display
+        const charQuick = document.getElementById('quick-character-display');
+        if (Character.data) {
+            charQuick.innerHTML = Character.getQuickView();
+        } else {
+            charQuick.innerHTML = '<p class="text-muted">Create your hero in the Character tab!</p>';
+        }
+
+        // Today's tasks
+        const todayTasks = document.getElementById('today-tasks-list');
+        const tasks = Tasks.getTodaysTasks();
+        if (tasks.length > 0) {
+            todayTasks.innerHTML = tasks.slice(0, 5).map(t => Tasks.getTaskPreview(t)).join('');
+        } else {
+            todayTasks.innerHTML = '<p class="text-muted">No quests for today. Add some!</p>';
+        }
+
+        // Daily habits
+        const habitsDiv = document.getElementById('daily-habits-list');
+        const habits = Tasks.getHabits();
+        if (habits.length > 0) {
+            habitsDiv.innerHTML = habits.map(h => Tasks.getHabitPreview(h)).join('');
+        } else {
+            habitsDiv.innerHTML = '<p class="text-muted">No habits tracked yet.</p>';
+        }
+
+        // Dungeon progress
+        const dungeonQuick = document.getElementById('dungeon-quick-display');
+        dungeonQuick.innerHTML = Dungeon.getQuickView();
+    },
+
+    showGameScreen() {
+        document.getElementById('login-screen').classList.remove('active');
+        document.getElementById('game-screen').classList.add('active');
+        document.getElementById('user-display').textContent = this.currentUser;
+        
+        // Initialize all modules
+        Character.init();
+        Tasks.init();
+        Dungeon.init();
+        
+        this.renderDashboard();
+    },
+
+    showLoginScreen() {
+        document.getElementById('game-screen').classList.remove('active');
+        document.getElementById('login-screen').classList.add('active');
+    },
+
+    logout() {
+        localStorage.removeItem('questforge_current_user');
+        this.currentUser = null;
+        this.showLoginScreen();
+    },
+
+    // Modal System
+    openModal(content) {
+        document.getElementById('modal-content').innerHTML = content;
+        document.getElementById('modal-overlay').classList.add('active');
+    },
+
+    closeModal() {
+        document.getElementById('modal-overlay').classList.remove('active');
+    },
+
+    // Utility: Show notification
+    notify(message, type = 'info') {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.innerHTML = `
+            <span>${message}</span>
+        `;
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            background: ${type === 'success' ? 'var(--success)' : type === 'error' ? 'var(--danger)' : 'var(--secondary)'};
+            color: ${type === 'success' ? 'var(--bg-dark)' : 'var(--text-primary)'};
+            border-radius: var(--radius-md);
+            z-index: 2000;
+            animation: slideIn 0.3s ease;
+            font-weight: 500;
+        `;
+
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+            notification.style.animation = 'fadeOut 0.3s ease forwards';
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    },
+
+    // Save all data
+    saveAllData() {
+        if (this.currentUser) {
+            const userData = {
+                character: Character.data,
+                tasks: Tasks.data,
+                dungeon: Dungeon.data
+            };
+            localStorage.setItem(`questforge_data_${this.currentUser}`, JSON.stringify(userData));
+        }
+    }
+};
+
+// Add notification animations to CSS dynamically
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes fadeOut {
+        from { opacity: 1; }
+        to { opacity: 0; }
+    }
+`;
+document.head.appendChild(style);
+
+// Initialize app when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    App.init();
+});
