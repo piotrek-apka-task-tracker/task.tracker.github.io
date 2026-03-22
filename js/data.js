@@ -168,7 +168,7 @@ const GameData = {
             bonus: { wisdom: 2, strength: 1 }
         }
     }
-    
+    },
     // ================================
     // DUNGEON DATA (Segment 6)
     // ================================
