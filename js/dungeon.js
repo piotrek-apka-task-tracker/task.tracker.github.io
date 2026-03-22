@@ -1,193 +1,841 @@
+console.log('DUNGEON.JS LOADED');
+
+// ================================
+// Dungeon System
+// ================================
+
+const Dungeon = {
+    data: {
+        currentLevel: 1,
+        highestLevel: 1,
+        bossesDefeated: [],
+        artifacts: [],
+        loreUnlocked: [],
+        currentRun: null
+    },
+
+    // Combat state (transient, not saved)
+    combat: null,
+
+    init() {
+        console.log('Dungeon module initialized');
+        this.migrateData();
+    },
+
+    migrateData() {
+        if (!this.data) {
+            this.data = {
+                currentLevel: 1,
+                highestLevel: 1,
+                bossesDefeated: [],
+                artifacts: [],
+                loreUnlocked: [],
+                currentRun: null
+            };
+        }
+
+        // Ensure arrays exist
+        if (!Array.isArray(this.data.bossesDefeated)) this.data.bossesDefeated = [];
+        if (!Array.isArray(this.data.artifacts)) this.data.artifacts = [];
+        if (!Array.isArray(this.data.loreUnlocked)) this.data.loreUnlocked = [];
+    },
 
     // ================================
-    // DUNGEON DATA (Segment 6)
+    // Monster Generation
     // ================================
 
-    // Monster types by category
-    monsterTypes: {
-        beast: {
-            name: 'Beast',
-            icon: '🐺',
-            color: '#8b4513',
-            statBias: { strength: 1.2, constitution: 1.1, dexterity: 1.0 }
-        },
-        undead: {
-            name: 'Undead',
-            icon: '💀',
-            color: '#4a5568',
-            statBias: { constitution: 1.3, strength: 1.0, wisdom: 0.8 }
-        },
-        demon: {
-            name: 'Demon',
-            icon: '👹',
-            color: '#dc2626',
-            statBias: { strength: 1.3, intelligence: 1.1, charisma: 0.7 }
-        },
-        elemental: {
-            name: 'Elemental',
-            icon: '🔥',
-            color: '#f59e0b',
-            statBias: { intelligence: 1.3, dexterity: 1.1, constitution: 0.9 }
-        },
-        construct: {
-            name: 'Construct',
-            icon: '🗿',
-            color: '#6b7280',
-            statBias: { constitution: 1.4, strength: 1.1, dexterity: 0.7 }
-        },
-        dragon: {
-            name: 'Dragon',
-            icon: '🐉',
-            color: '#7c3aed',
-            statBias: { strength: 1.2, intelligence: 1.2, constitution: 1.2 }
+    generateMonster(floor, isBoss = false) {
+        const types = Object.keys(GameData.monsterTypes);
+        const type = types[Math.floor(Math.random() * types.length)];
+        const typeData = GameData.monsterTypes[type];
+
+        // Generate name
+        let name;
+        if (isBoss) {
+            const titles = GameData.bossNames.titles;
+            const names = GameData.bossNames.names;
+            const epithets = GameData.bossNames.epithets;
+            name = `${titles[Math.floor(Math.random() * titles.length)]} ${names[Math.floor(Math.random() * names.length)]} ${epithets[Math.floor(Math.random() * epithets.length)]}`;
+        } else {
+            const prefixes = GameData.monsterNames.prefixes;
+            const baseNames = GameData.monsterNames[type];
+            name = `${prefixes[Math.floor(Math.random() * prefixes.length)]} ${baseNames[Math.floor(Math.random() * baseNames.length)]}`;
+        }
+
+        // Calculate stats based on floor
+        const scaleFactor = 1 + (floor * 0.15);
+        const bossMultiplier = isBoss ? 2.5 : 1;
+
+        const baseHp = 30 + (floor * 8);
+        const baseAttack = 5 + (floor * 2);
+        const baseDefense = 3 + Math.floor(floor * 1.5);
+        const baseSpeed = 8 + Math.floor(floor * 0.8);
+
+        const monster = {
+            id: 'monster_' + Date.now() + '_' + Math.random().toString(36).slice(2),
+            name,
+            type,
+            icon: typeData.icon,
+            color: typeData.color,
+            isBoss,
+            floor,
+
+            maxHp: Math.floor(baseHp * scaleFactor * bossMultiplier * (typeData.statBias.constitution || 1)),
+            hp: 0,
+            attack: Math.floor(baseAttack * scaleFactor * bossMultiplier * (typeData.statBias.strength || 1)),
+            defense: Math.floor(baseDefense * scaleFactor * bossMultiplier * (typeData.statBias.constitution || 1)),
+            speed: Math.floor(baseSpeed * scaleFactor * (typeData.statBias.dexterity || 1)),
+
+            xpReward: Math.floor((10 + floor * 5) * bossMultiplier),
+            goldReward: Math.floor((5 + floor * 3) * bossMultiplier)
+        };
+
+        monster.hp = monster.maxHp;
+
+        return monster;
+    },
+
+    // ================================
+    // Combat System
+    // ================================
+
+    startCombat(monster) {
+        if (!Character.data) {
+            App.notify('Create a character first!', 'error');
+            return;
+        }
+
+        this.combat = {
+            monster,
+            turn: 'player',
+            log: [],
+            isOver: false,
+            result: null,
+            turnNumber: 1
+        };
+
+        this.addCombatLog(`⚔️ Battle begins against ${monster.name}!`);
+        this.renderCombat();
+    },
+
+    addCombatLog(message) {
+        if (!this.combat) return;
+
+        this.combat.log.push({
+            message,
+            turn: this.combat.turnNumber,
+            timestamp: Date.now()
+        });
+
+        // Keep only last 50 entries
+        if (this.combat.log.length > 50) {
+            this.combat.log = this.combat.log.slice(-50);
         }
     },
 
-    // Monster name parts for generation
-    monsterNames: {
-        prefixes: [
-            'Shadow', 'Crimson', 'Frost', 'Ancient', 'Corrupted', 'Feral',
-            'Cursed', 'Infernal', 'Spectral', 'Savage', 'Dire', 'Venom',
-            'Storm', 'Iron', 'Bone', 'Blood', 'Dark', 'Chaos', 'Void', 'Doom'
-        ],
-        beast: ['Wolf', 'Bear', 'Boar', 'Spider', 'Serpent', 'Bat', 'Rat', 'Scorpion', 'Hound', 'Warg'],
-        undead: ['Skeleton', 'Zombie', 'Wraith', 'Ghoul', 'Revenant', 'Wight', 'Specter', 'Lich'],
-        demon: ['Imp', 'Fiend', 'Demon', 'Hellspawn', 'Succubus', 'Tormentor', 'Defiler'],
-        elemental: ['Wisp', 'Elemental', 'Golem', 'Spirit', 'Phoenix', 'Djinn', 'Salamander'],
-        construct: ['Golem', 'Automaton', 'Guardian', 'Sentinel', 'Colossus', 'Juggernaut'],
-        dragon: ['Wyrm', 'Drake', 'Wyvern', 'Dragon', 'Serpent', 'Hydra']
-    },
+    calculateDamage(attacker, defender, isPlayer) {
+        // Base damage
+        let damage = attacker.attack;
 
-    // Boss name parts
-    bossNames: {
-        titles: [
-            'Lord', 'King', 'Queen', 'Emperor', 'Overlord', 'Master',
-            'Archon', 'Sovereign', 'Tyrant', 'Champion', 'Warden', 'Harbinger'
-        ],
-        names: [
-            'Malachar', 'Vexoria', 'Drakthos', 'Nethris', 'Zarvok', 'Kelmora',
-            'Ashenbane', 'Grimhold', 'Shadowmere', 'Bloodthorn', 'Doomweaver',
-            'Soulreaver', 'Nightbringer', 'Hellforge', 'Deathwhisper', 'Voidwalker',
-            'Ironclad', 'Frostbane', 'Flameheart', 'Stormcaller', 'Earthshaker'
-        ],
-        epithets: [
-            'the Destroyer', 'the Eternal', 'the Merciless', 'the Undying',
-            'of the Abyss', 'the Corrupted', 'the Ancient', 'the Terrible',
-            'the Devourer', 'of Shadows', 'the Accursed', 'the Relentless',
-            'of Chaos', 'the Forsaken', 'the Immortal', 'of Darkness'
-        ]
-    },
+        // Defense reduction (diminishing returns)
+        const defenseReduction = defender.defense / (defender.defense + 50);
+        damage = damage * (1 - defenseReduction * 0.5);
 
-    // Artifacts (boss rewards)
-    artifacts: [
-        // Tier 1 (Floors 1-10)
-        { id: 'sword_of_dawn', name: 'Sword of Dawn', icon: '🗡️', tier: 1, stats: { attack: 5 }, description: 'A blade that glows with morning light.' },
-        { id: 'shield_of_valor', name: 'Shield of Valor', icon: '🛡️', tier: 1, stats: { defense: 5 }, description: 'Worn by heroes of old.' },
-        { id: 'boots_of_swiftness', name: 'Boots of Swiftness', icon: '👢', tier: 1, stats: { speed: 5 }, description: 'Light as a feather, fast as wind.' },
-        { id: 'amulet_of_fortune', name: 'Amulet of Fortune', icon: '📿', tier: 1, stats: { luck: 5 }, description: 'Lady luck smiles upon you.' },
-        { id: 'ring_of_vitality', name: 'Ring of Vitality', icon: '💍', tier: 1, stats: { maxHp: 25 }, description: 'Pulses with life energy.' },
-        { id: 'circlet_of_wisdom', name: 'Circlet of Wisdom', icon: '👑', tier: 1, stats: { maxMp: 20 }, description: 'Enhances mental fortitude.' },
+        // Random variance (±20%)
+        const variance = 0.8 + Math.random() * 0.4;
+        damage = Math.floor(damage * variance);
 
-        // Tier 2 (Floors 11-25)
-        { id: 'blade_of_fury', name: 'Blade of Fury', icon: '⚔️', tier: 2, stats: { attack: 12, speed: 3 }, description: 'Rage incarnate in steel.' },
-        { id: 'armor_of_titans', name: 'Armor of the Titans', icon: '🦺', tier: 2, stats: { defense: 10, maxHp: 30 }, description: 'Forged by giants.' },
-        { id: 'cloak_of_shadows', name: 'Cloak of Shadows', icon: '🧥', tier: 2, stats: { speed: 8, luck: 5 }, description: 'Blend into darkness itself.' },
-        { id: 'orb_of_power', name: 'Orb of Power', icon: '🔮', tier: 2, stats: { attack: 8, maxMp: 30 }, description: 'Crackles with arcane energy.' },
-        { id: 'helm_of_insight', name: 'Helm of Insight', icon: '⛑️', tier: 2, stats: { defense: 5, luck: 8 }, description: 'See through deception.' },
-        { id: 'gauntlets_of_might', name: 'Gauntlets of Might', icon: '🧤', tier: 2, stats: { attack: 10, defense: 5 }, description: 'Crush stone with ease.' },
+        // Critical hit chance (based on luck/speed)
+        const critChance = isPlayer
+            ? (Character.data.luck || 0) / 100
+            : 0.05;
 
-        // Tier 3 (Floors 26-50)
-        { id: 'excalibur', name: 'Excalibur', icon: '🗡️', tier: 3, stats: { attack: 25, luck: 10 }, description: 'The legendary sword of kings.' },
-        { id: 'aegis_shield', name: 'Aegis Shield', icon: '🛡️', tier: 3, stats: { defense: 20, maxHp: 50 }, description: 'Blessed by the gods.' },
-        { id: 'hermes_sandals', name: "Hermes' Sandals", icon: '👟', tier: 3, stats: { speed: 20, luck: 8 }, description: 'Walk upon the wind.' },
-        { id: 'crown_of_ages', name: 'Crown of Ages', icon: '👑', tier: 3, stats: { maxHp: 40, maxMp: 40, luck: 5 }, description: 'Worn by eternal rulers.' },
-        { id: 'dragon_heart', name: 'Dragon Heart', icon: '❤️‍🔥', tier: 3, stats: { attack: 15, defense: 15, maxHp: 30 }, description: 'Still beats with draconic fire.' },
-        { id: 'void_crystal', name: 'Void Crystal', icon: '💎', tier: 3, stats: { attack: 18, maxMp: 50, speed: 5 }, description: 'Contains infinite darkness.' },
-
-        // Tier 4 (Floors 51+)
-        { id: 'godslayer', name: 'Godslayer', icon: '⚔️', tier: 4, stats: { attack: 50, speed: 15 }, description: 'Even immortals fear this blade.' },
-        { id: 'infinity_armor', name: 'Armor of Infinity', icon: '🛡️', tier: 4, stats: { defense: 40, maxHp: 100 }, description: 'Woven from the fabric of reality.' },
-        { id: 'cosmic_boots', name: 'Cosmic Boots', icon: '👢', tier: 4, stats: { speed: 35, luck: 20 }, description: 'Step between dimensions.' },
-        { id: 'soul_gem', name: 'Soul Gem', icon: '💠', tier: 4, stats: { maxHp: 75, maxMp: 75, luck: 15 }, description: 'Contains countless souls.' },
-        { id: 'world_ender', name: 'World Ender', icon: '🌑', tier: 4, stats: { attack: 40, defense: 25, speed: 10 }, description: 'The final weapon.' }
-    ],
-
-    // Lore entries (unlocked by defeating bosses)
-    lore: [
-        {
-            id: 'lore_1',
-            floor: 5,
-            title: 'The Sundering',
-            text: `Long ago, the world was whole. Then came the Sundering—a cataclysm that tore reality asunder. The dungeons appeared that day, rifts into realms of chaos and nightmare. No one knows what caused it, but the old kingdom fell, and darkness crept into the land.`
-        },
-        {
-            id: 'lore_2',
-            floor: 10,
-            title: 'The First Heroes',
-            text: `In the aftermath of the Sundering, heroes arose. They delved into the dungeons, seeking to close the rifts. Many fell, but those who survived grew powerful beyond measure. They became legends—the Godforged, humanity's shield against the abyss.`
-        },
-        {
-            id: 'lore_3',
-            floor: 15,
-            title: 'The Corruption Spreads',
-            text: `The Godforged sealed many rifts, but they could not close them all. Slowly, corruption seeped into the world. Monsters emerged from the depths. Villages fell silent. The dungeons grew deeper, darker, hungrier.`
-        },
-        {
-            id: 'lore_4',
-            floor: 20,
-            title: 'The Order of Dawn',
-            text: `A new order was founded—the Order of Dawn. Unlike the solitary Godforged, they trained armies. They built fortresses around dungeon entrances. For centuries, they held the line, but their numbers dwindled with each passing year.`
-        },
-        {
-            id: 'lore_5',
-            floor: 25,
-            title: 'The Void Beckons',
-            text: `At the deepest levels of the dungeons lies the Void—a realm of pure chaos. Those who glimpse it are forever changed. Some go mad. Others gain terrible power. The Void whispers promises of strength to those brave or foolish enough to listen.`
-        },
-        {
-            id: 'lore_6',
-            floor: 30,
-            title: 'The Artifact Wars',
-            text: `The dungeons contain treasures of immense power—artifacts from before the Sundering. Nations warred over these relics. The Artifact Wars lasted a century and left the world scarred. Now, only the brave dare claim these prizes.`
-        },
-        {
-            id: 'lore_7',
-            floor: 35,
-            title: 'The Dragon Lords',
-            text: `Deep within the dungeons, dragons rule. Not the beasts of legend, but ancient intelligences who remember the world before. They guard secrets older than humanity and test all who seek passage deeper.`
-        },
-        {
-            id: 'lore_8',
-            floor: 40,
-            title: 'The Last Godforged',
-            text: `Only one of the original Godforged still lives—Eldara the Eternal. She guards the deepest seal, holding back what lies beyond. Some say she waits for a worthy successor. Others say she has become something no longer human.`
-        },
-        {
-            id: 'lore_9',
-            floor: 45,
-            title: 'The Heart of Darkness',
-            text: `At floor fifty lies the Heart of Darkness—a crystallized shard of the Sundering itself. It pulses with malevolent energy, spawning endless horrors. Many believe destroying it would close all rifts. None have succeeded.`
-        },
-        {
-            id: 'lore_10',
-            floor: 50,
-            title: 'Beyond the Veil',
-            text: `You have reached the depths where reality frays. Beyond floor fifty, the dungeon changes. It responds to your presence, reshaping itself, growing stronger as you do. Here, the true challenge begins. Here, legends are forged or forgotten.`
+        const isCrit = Math.random() < critChance;
+        if (isCrit) {
+            damage = Math.floor(damage * 1.5);
         }
-    ],
 
-    // Get artifact by tier (for boss rewards)
-    getArtifactForFloor(floor) {
-        let tier = 1;
-        if (floor > 50) tier = 4;
-        else if (floor > 25) tier = 3;
-        else if (floor > 10) tier = 2;
+        // Minimum 1 damage
+        damage = Math.max(1, damage);
 
-        const available = this.artifacts.filter(a => a.tier === tier);
-        return available[Math.floor(Math.random() * available.length)];
+        return { damage, isCrit };
     },
 
-    // Get lore for floor (if any)
-    getLoreForFloor(floor) {
-        return this.lore.find(l => l.floor === floor) || null;
+    playerAttack() {
+        if (!this.combat || this.combat.isOver || this.combat.turn !== 'player') return;
+
+        const player = Character.data;
+        const monster = this.combat.monster;
+
+        const { damage, isCrit } = this.calculateDamage(player, monster, true);
+
+        monster.hp = Math.max(0, monster.hp - damage);
+
+        const critText = isCrit ? ' 💥 CRITICAL!' : '';
+        this.addCombatLog(`You deal ${damage} damage to ${monster.name}.${critText}`);
+
+        if (monster.hp <= 0) {
+            this.endCombat('victory');
+        } else {
+            this.combat.turn = 'monster';
+            this.combat.turnNumber++;
+            this.renderCombat();
+
+            // Monster attacks after short delay
+            setTimeout(() => this.monsterAttack(), 800);
+        }
+    },
+
+    playerDefend() {
+        if (!this.combat || this.combat.isOver || this.combat.turn !== 'player') return;
+
+        // Defending reduces incoming damage and restores some MP
+        this.combat.playerDefending = true;
+
+        const mpRestore = Math.floor(Character.data.maxMp * 0.1);
+        Character.data.mp = Math.min(Character.data.maxMp, Character.data.mp + mpRestore);
+
+        this.addCombatLog(`You take a defensive stance. (+${mpRestore} MP)`);
+
+        this.combat.turn = 'monster';
+        this.combat.turnNumber++;
+        this.renderCombat();
+
+        setTimeout(() => this.monsterAttack(), 800);
+    },
+
+    playerHeal() {
+        if (!this.combat || this.combat.isOver || this.combat.turn !== 'player') return;
+
+        const mpCost = 20;
+        if (Character.data.mp < mpCost) {
+            App.notify('Not enough MP!', 'error');
+            return;
+        }
+
+        Character.data.mp -= mpCost;
+
+        // Heal based on wisdom and level
+        const healAmount = Math.floor(20 + Character.data.level * 5 + (Character.getStat('wisdom') * 2));
+        const actualHeal = Math.min(healAmount, Character.data.maxHp - Character.data.hp);
+
+        Character.data.hp += actualHeal;
+
+        this.addCombatLog(`You cast Heal! Restored ${actualHeal} HP. (-${mpCost} MP)`);
+
+        this.combat.turn = 'monster';
+        this.combat.turnNumber++;
+        this.renderCombat();
+
+        setTimeout(() => this.monsterAttack(), 800);
+    },
+
+    playerFlee() {
+        if (!this.combat || this.combat.isOver || this.combat.turn !== 'player') return;
+
+        // Flee chance based on speed comparison
+        const playerSpeed = Character.data.speed;
+        const monsterSpeed = this.combat.monster.speed;
+        const fleeChance = 0.3 + (playerSpeed - monsterSpeed) / 100;
+
+        if (Math.random() < fleeChance) {
+            this.addCombatLog('You successfully fled from battle!');
+            this.endCombat('fled');
+        } else {
+            this.addCombatLog('Failed to flee!');
+            this.combat.turn = 'monster';
+            this.combat.turnNumber++;
+            this.renderCombat();
+
+            setTimeout(() => this.monsterAttack(), 800);
+        }
+    },
+
+    monsterAttack() {
+        if (!this.combat || this.combat.isOver) return;
+
+        const player = Character.data;
+        const monster = this.combat.monster;
+
+        let { damage, isCrit } = this.calculateDamage(monster, player, false);
+
+        // Reduce damage if player was defending
+        if (this.combat.playerDefending) {
+            damage = Math.floor(damage * 0.5);
+            this.combat.playerDefending = false;
+        }
+
+        player.hp = Math.max(0, player.hp - damage);
+
+        const critText = isCrit ? ' 💥 CRITICAL!' : '';
+        this.addCombatLog(`${monster.name} deals ${damage} damage to you.${critText}`);
+
+        if (player.hp <= 0) {
+            this.endCombat('defeat');
+        } else {
+            this.combat.turn = 'player';
+            this.renderCombat();
+        }
+
+        Auth.saveUserData();
+    },
+
+    endCombat(result) {
+        if (!this.combat) return;
+
+        this.combat.isOver = true;
+        this.combat.result = result;
+
+        const monster = this.combat.monster;
+
+        if (result === 'victory') {
+            this.addCombatLog(`🎉 Victory! You defeated ${monster.name}!`);
+
+            // Award XP
+            Character.addExperience(monster.xpReward, {
+                source: 'dungeon',
+                monsterName: monster.name,
+                floor: monster.floor,
+                isBoss: monster.isBoss
+            });
+
+            // Update progress
+            if (monster.floor >= this.data.currentLevel) {
+                this.data.currentLevel = monster.floor + 1;
+                if (this.data.currentLevel > this.data.highestLevel) {
+                    this.data.highestLevel = this.data.currentLevel;
+                }
+            }
+
+            // Boss rewards
+            if (monster.isBoss) {
+                this.data.bossesDefeated.push({
+                    name: monster.name,
+                    floor: monster.floor,
+                    defeatedAt: new Date().toISOString()
+                });
+
+                // Award artifact
+                const artifact = GameData.getArtifactForFloor(monster.floor);
+                if (artifact && !this.data.artifacts.find(a => a.id === artifact.id)) {
+                    this.data.artifacts.push({
+                        ...artifact,
+                        obtainedAt: new Date().toISOString(),
+                        fromFloor: monster.floor
+                    });
+                    this.addCombatLog(`🏆 Obtained artifact: ${artifact.icon} ${artifact.name}!`);
+                }
+
+                // Unlock lore
+                const lore = GameData.getLoreForFloor(monster.floor);
+                if (lore && !this.data.loreUnlocked.includes(lore.id)) {
+                    this.data.loreUnlocked.push(lore.id);
+                    this.addCombatLog(`📜 New lore discovered: "${lore.title}"`);
+                }
+            }
+
+            // Small heal after victory
+            const healAmount = Math.floor(Character.data.maxHp * 0.1);
+            Character.data.hp = Math.min(Character.data.maxHp, Character.data.hp + healAmount);
+
+        } else if (result === 'defeat') {
+            this.addCombatLog(`💀 Defeated by ${monster.name}...`);
+
+            // Restore some HP so player can continue
+            Character.data.hp = Math.floor(Character.data.maxHp * 0.25);
+
+        } else if (result === 'fled') {
+            // No penalty for fleeing
+        }
+
+        Auth.saveUserData();
+        this.renderCombat();
+    },
+
+    // ================================
+    // Artifact System
+    // ================================
+
+    getArtifactBonuses() {
+        const bonuses = {
+            attack: 0,
+            defense: 0,
+            speed: 0,
+            luck: 0,
+            maxHp: 0,
+            maxMp: 0
+        };
+
+        for (const artifact of this.data.artifacts) {
+            for (const [stat, value] of Object.entries(artifact.stats || {})) {
+                if (bonuses.hasOwnProperty(stat)) {
+                    bonuses[stat] += value;
+                }
+            }
+        }
+
+        return bonuses;
+    },
+
+    getEffectiveStats() {
+        if (!Character.data) return null;
+
+        const bonuses = this.getArtifactBonuses();
+
+        return {
+            attack: Character.data.attack + bonuses.attack,
+            defense: Character.data.defense + bonuses.defense,
+            speed: Character.data.speed + bonuses.speed,
+            luck: Character.data.luck + bonuses.luck,
+            maxHp: Character.data.maxHp + bonuses.maxHp,
+            maxMp: Character.data.maxMp + bonuses.maxMp
+        };
+    },
+
+    // ================================
+    // UI Rendering
+    // ================================
+
+    render() {
+        const container = document.getElementById('dungeon-display');
+        if (!container) return;
+
+        if (!Character.data) {
+            container.innerHTML = `
+                <div class="dungeon-no-hero">
+                    <div class="no-hero-icon">🏰</div>
+                    <h2>The Dungeon Awaits</h2>
+                    <p>Create a hero before entering the dungeon!</p>
+                    <button class="btn btn-primary" onclick="App.switchView('character')">
+                        Create Hero
+                    </button>
+                </div>
+            `;
+            return;
+        }
+
+        // Check if in combat
+        if (this.combat && !this.combat.isOver) {
+            this.renderCombat();
+            return;
+        }
+
+        const effectiveStats = this.getEffectiveStats();
+
+        container.innerHTML = `
+            <div class="dungeon-main">
+                <!-- Dungeon Header -->
+                <div class="dungeon-header">
+                    <div class="dungeon-level">
+                        <span class="level-icon">🏰</span>
+                        <div class="level-info">
+                            <h2>Floor ${this.data.currentLevel}</h2>
+                            <p>Highest: Floor ${this.data.highestLevel}</p>
+                        </div>
+                    </div>
+                    <div class="dungeon-stats">
+                        <span class="dstat">👹 ${this.data.bossesDefeated.length} Bosses</span>
+                        <span class="dstat">⚔️ ${this.data.artifacts.length} Artifacts</span>
+                        <span class="dstat">📜 ${this.data.loreUnlocked.length} Lore</span>
+                    </div>
+                </div>
+
+                <!-- Hero Status -->
+                <div class="dungeon-hero-status">
+                    <div class="hero-bars">
+                        <div class="hero-bar">
+                            <span class="bar-label">❤️ HP</span>
+                            <div class="bar-track hp">
+                                <div class="bar-fill" style="width: ${(Character.data.hp / effectiveStats.maxHp) * 100}%"></div>
+                            </div>
+                            <span class="bar-value">${Character.data.hp}/${effectiveStats.maxHp}</span>
+                        </div>
+                        <div class="hero-bar">
+                            <span class="bar-label">💧 MP</span>
+                            <div class="bar-track mp">
+                                <div class="bar-fill" style="width: ${(Character.data.mp / effectiveStats.maxMp) * 100}%"></div>
+                            </div>
+                            <span class="bar-value">${Character.data.mp}/${effectiveStats.maxMp}</span>
+                        </div>
+                    </div>
+                    <div class="hero-combat-stats">
+                        <span>⚔️ ${effectiveStats.attack}</span>
+                        <span>🛡️ ${effectiveStats.defense}</span>
+                        <span>💨 ${effectiveStats.speed}</span>
+                        <span>🍀 ${effectiveStats.luck}</span>
+                    </div>
+                </div>
+
+                <!-- Dungeon Actions -->
+                <div class="dungeon-actions">
+                    <button class="btn btn-primary btn-large" onclick="Dungeon.enterFloor(${this.data.currentLevel})">
+                        ⚔️ Enter Floor ${this.data.currentLevel}
+                    </button>
+                    ${this.data.currentLevel > 1 ? `
+                        <button class="btn btn-secondary" onclick="Dungeon.showFloorSelect()">
+                            📋 Select Floor
+                        </button>
+                    ` : ''}
+                </div>
+
+                <!-- Floor Info -->
+                <div class="floor-info">
+                    ${this.getFloorInfo(this.data.currentLevel)}
+                </div>
+
+                <!-- Tabs for Artifacts/Lore -->
+                <div class="dungeon-tabs">
+                    <button class="dtab active" onclick="Dungeon.showTab('artifacts')">
+                        ⚔️ Artifacts (${this.data.artifacts.length})
+                    </button>
+                    <button class="dtab" onclick="Dungeon.showTab('lore')">
+                        📜 Lore (${this.data.loreUnlocked.length})
+                    </button>
+                    <button class="dtab" onclick="Dungeon.showTab('bosses')">
+                        👹 Bosses (${this.data.bossesDefeated.length})
+                    </button>
+                </div>
+
+                <div class="dungeon-tab-content" id="dungeon-tab-content">
+                    ${this.renderArtifactsTab()}
+                </div>
+            </div>
+        `;
+    },
+
+    getFloorInfo(floor) {
+        const isBossFloor = floor % 5 === 0;
+        const monsterLevel = Math.ceil(floor * 1.5);
+
+        let difficulty = 'Normal';
+        let diffClass = 'normal';
+        if (floor > 50) { difficulty = 'Nightmare'; diffClass = 'nightmare'; }
+        else if (floor > 25) { difficulty = 'Hard'; diffClass = 'hard'; }
+        else if (floor > 10) { difficulty = 'Challenging'; diffClass = 'challenging'; }
+
+        return `
+            <div class="floor-details">
+                <span class="floor-difficulty ${diffClass}">${difficulty}</span>
+                <span>Monster Lvl: ~${monsterLevel}</span>
+                ${isBossFloor ? '<span class="boss-warning">👹 BOSS FLOOR</span>' : ''}
+            </div>
+        `;
+    },
+
+    showTab(tabName) {
+        // Update tab buttons
+        document.querySelectorAll('.dtab').forEach(t => t.classList.remove('active'));
+        event.target.classList.add('active');
+
+        // Update content
+        const content = document.getElementById('dungeon-tab-content');
+        if (!content) return;
+
+        switch (tabName) {
+            case 'artifacts':
+                content.innerHTML = this.renderArtifactsTab();
+                break;
+            case 'lore':
+                content.innerHTML = this.renderLoreTab();
+                break;
+            case 'bosses':
+                content.innerHTML = this.renderBossesTab();
+                break;
+        }
+    },
+
+    renderArtifactsTab() {
+        if (this.data.artifacts.length === 0) {
+            return `
+                <div class="tab-empty">
+                    <p>No artifacts collected yet.</p>
+                    <p class="text-muted">Defeat bosses to earn powerful artifacts!</p>
+                </div>
+            `;
+        }
+
+        const bonuses = this.getArtifactBonuses();
+
+        return `
+            <div class="artifacts-summary">
+                <h4>Total Bonuses:</h4>
+                <div class="bonus-list">
+                    ${bonuses.attack > 0 ? `<span>⚔️ +${bonuses.attack}</span>` : ''}
+                    ${bonuses.defense > 0 ? `<span>🛡️ +${bonuses.defense}</span>` : ''}
+                    ${bonuses.speed > 0 ? `<span>💨 +${bonuses.speed}</span>` : ''}
+                    ${bonuses.luck > 0 ? `<span>🍀 +${bonuses.luck}</span>` : ''}
+                    ${bonuses.maxHp > 0 ? `<span>❤️ +${bonuses.maxHp}</span>` : ''}
+                    ${bonuses.maxMp > 0 ? `<span>💧 +${bonuses.maxMp}</span>` : ''}
+                </div>
+            </div>
+            <div class="artifacts-list">
+                ${this.data.artifacts.map(a => `
+                    <div class="artifact-card tier-${a.tier}">
+                        <span class="artifact-icon">${a.icon}</span>
+                        <div class="artifact-info">
+                            <h4>${a.name}</h4>
+                            <p class="artifact-desc">${a.description}</p>
+                            <div class="artifact-stats">
+                                ${Object.entries(a.stats).map(([stat, val]) => {
+                                    const icons = { attack: '⚔️', defense: '🛡️', speed: '💨', luck: '🍀', maxHp: '❤️', maxMp: '💧' };
+                                    return `<span>${icons[stat] || ''} +${val}</span>`;
+                                }).join('')}
+                            </div>
+                        </div>
+                        <span class="artifact-floor">Floor ${a.fromFloor}</span>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    },
+
+    renderLoreTab() {
+        if (this.data.loreUnlocked.length === 0) {
+            return `
+                <div class="tab-empty">
+                    <p>No lore discovered yet.</p>
+                    <p class="text-muted">Defeat bosses on special floors to uncover the story!</p>
+                </div>
+            `;
+        }
+
+        const unlockedLore = GameData.lore.filter(l => this.data.loreUnlocked.includes(l.id));
+
+        return `
+            <div class="lore-list">
+                ${unlockedLore.map(l => `
+                    <div class="lore-card" onclick="Dungeon.showLoreDetail('${l.id}')">
+                        <span class="lore-floor">Floor ${l.floor}</span>
+                        <h4>${l.title}</h4>
+                        <p class="lore-preview">${l.text.substring(0, 80)}...</p>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    },
+
+    renderBossesTab() {
+        if (this.data.bossesDefeated.length === 0) {
+            return `
+                <div class="tab-empty">
+                    <p>No bosses defeated yet.</p>
+                    <p class="text-muted">Bosses appear every 5 floors!</p>
+                </div>
+            `;
+        }
+
+        return `
+            <div class="bosses-list">
+                ${this.data.bossesDefeated.map(b => `
+                    <div class="boss-card">
+                        <span class="boss-icon">👹</span>
+                        <div class="boss-info">
+                            <h4>${b.name}</h4>
+                            <p>Defeated on Floor ${b.floor}</p>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    },
+
+    showLoreDetail(loreId) {
+        const lore = GameData.lore.find(l => l.id === loreId);
+        if (!lore) return;
+
+        const content = `
+            <div class="modal-header">
+                <h2>📜 ${lore.title}</h2>
+                <button class="modal-close" onclick="App.closeModal()">&times;</button>
+            </div>
+            <p class="lore-floor-badge">Discovered on Floor ${lore.floor}</p>
+            <div class="lore-text">
+                ${lore.text.split('\n').map(p => `<p>${p}</p>`).join('')}
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-secondary" onclick="App.closeModal()">Close</button>
+            </div>
+        `;
+
+        App.openModal(content);
+    },
+
+    showFloorSelect() {
+        let floorButtons = '';
+        for (let i = 1; i <= this.data.highestLevel; i++) {
+            const isBoss = i % 5 === 0;
+            const isCurrentMax = i === this.data.highestLevel;
+            floorButtons += `
+                <button class="floor-btn ${isBoss ? 'boss' : ''} ${isCurrentMax ? 'current' : ''}"
+                        onclick="Dungeon.enterFloor(${i}); App.closeModal();">
+                    ${i} ${isBoss ? '👹' : ''}
+                </button>
+            `;
+        }
+
+        const content = `
+            <div class="modal-header">
+                <h2>📋 Select Floor</h2>
+                <button class="modal-close" onclick="App.closeModal()">&times;</button>
+            </div>
+            <p class="text-muted">Choose a floor to challenge (up to your highest reached).</p>
+            <div class="floor-grid">
+                ${floorButtons}
+            </div>
+        `;
+
+        App.openModal(content);
+    },
+
+    enterFloor(floor) {
+        App.closeModal();
+
+        const isBoss = floor % 5 === 0;
+        const monster = this.generateMonster(floor, isBoss);
+
+        this.startCombat(monster);
+    },
+
+    renderCombat() {
+        const container = document.getElementById('dungeon-display');
+        if (!container || !this.combat) return;
+
+        const monster = this.combat.monster;
+        const player = Character.data;
+        const effectiveStats = this.getEffectiveStats();
+
+        const isPlayerTurn = this.combat.turn === 'player' && !this.combat.isOver;
+        const combatLog = this.combat.log.slice(-8);
+
+        container.innerHTML = `
+            <div class="combat-arena">
+                <!-- Monster Section -->
+                <div class="combat-monster ${this.combat.isOver && this.combat.result === 'victory' ? 'defeated' : ''}">
+                    <div class="monster-header">
+                        <span class="monster-icon" style="background: ${monster.color}20; border-color: ${monster.color};">
+                            ${monster.icon}
+                        </span>
+                        <div class="monster-info">
+                            <h3>${monster.name}</h3>
+                            <p class="monster-type">${monster.isBoss ? '👹 BOSS • ' : ''}Floor ${monster.floor}</p>
+                        </div>
+                    </div>
+                    <div class="monster-hp">
+                        <div class="hp-bar-container">
+                            <div class="hp-bar monster-hp-bar">
+                                <div class="hp-fill" style="width: ${(monster.hp / monster.maxHp) * 100}%"></div>
+                            </div>
+                            <span class="hp-text">${monster.hp} / ${monster.maxHp}</span>
+                        </div>
+                    </div>
+                    <div class="monster-stats">
+                        <span>⚔️ ${monster.attack}</span>
+                        <span>🛡️ ${monster.defense}</span>
+                        <span>💨 ${monster.speed}</span>
+                    </div>
+                </div>
+
+                <!-- VS Divider -->
+                <div class="combat-vs">
+                    <span>⚔️</span>
+                    <span class="turn-indicator">${this.combat.isOver ? (this.combat.result === 'victory' ? 'VICTORY!' : this.combat.result === 'defeat' ? 'DEFEAT' : 'FLED') : (isPlayerTurn ? 'Your Turn' : 'Enemy Turn')}</span>
+                </div>
+
+                <!-- Player Section -->
+                <div class="combat-player ${this.combat.isOver && this.combat.result === 'defeat' ? 'defeated' : ''}">
+                    <div class="player-header">
+                        <span class="player-icon">${GameData.characterClasses[player.class].icon}</span>
+                        <div class="player-info">
+                            <h3>${player.name}</h3>
+                            <p>Level ${player.level} ${GameData.characterClasses[player.class].name}</p>
+                        </div>
+                    </div>
+                    <div class="player-bars">
+                        <div class="combat-bar-row">
+                            <span>❤️</span>
+                            <div class="bar-track hp">
+                                <div class="bar-fill" style="width: ${(player.hp / effectiveStats.maxHp) * 100}%"></div>
+                            </div>
+                            <span>${player.hp}/${effectiveStats.maxHp}</span>
+                        </div>
+                        <div class="combat-bar-row">
+                            <span>💧</span>
+                            <div class="bar-track mp">
+                                <div class="bar-fill" style="width: ${(player.mp / effectiveStats.maxMp) * 100}%"></div>
+                            </div>
+                            <span>${player.mp}/${effectiveStats.maxMp}</span>
+                        </div>
+                    </div>
+                    <div class="player-stats">
+                        <span>⚔️ ${effectiveStats.attack}</span>
+                        <span>🛡️ ${effectiveStats.defense}</span>
+                        <span>💨 ${effectiveStats.speed}</span>
+                        <span>🍀 ${effectiveStats.luck}</span>
+                    </div>
+                </div>
+
+                <!-- Combat Log -->
+                <div class="combat-log">
+                    ${combatLog.map(entry => `
+                        <div class="log-line">${entry.message}</div>
+                    `).join('')}
+                </div>
+
+                <!-- Combat Actions -->
+                <div class="combat-actions">
+                    ${this.combat.isOver ? `
+                        <button class="btn btn-primary btn-large" onclick="Dungeon.exitCombat()">
+                            ${this.combat.result === 'victory' ? '🎉 Continue' : '🏠 Return'}
+                        </button>
+                    ` : `
+                        <button class="btn btn-primary ${!isPlayerTurn ? 'disabled' : ''}" 
+                                onclick="Dungeon.playerAttack()" ${!isPlayerTurn ? 'disabled' : ''}>
+                            ⚔️ Attack
+                        </button>
+                        <button class="btn btn-secondary ${!isPlayerTurn ? 'disabled' : ''}" 
+                                onclick="Dungeon.playerDefend()" ${!isPlayerTurn ? 'disabled' : ''}>
+                            🛡️ Defend
+                        </button>
+                        <button class="btn btn-secondary ${!isPlayerTurn || player.mp < 20 ? 'disabled' : ''}" 
+                                onclick="Dungeon.playerHeal()" ${!isPlayerTurn || player.mp < 20 ? 'disabled' : ''}>
+                            💚 Heal (20 MP)
+                        </button>
+                        <button class="btn btn-secondary ${!isPlayerTurn ? 'disabled' : ''}" 
+                                onclick="Dungeon.playerFlee()" ${!isPlayerTurn ? 'disabled' : ''}>
+                            🏃 Flee
+                        </button>
+                    `}
+                </div>
+            </div>
+        `;
+    },
+
+    exitCombat() {
+        this.combat = null;
+        this.render();
+        App.renderDashboard();
+    },
+
+    // Quick view for dashboard
+    getQuickView() {
+        const bossCount = this.data.bossesDefeated.length;
+        const artifactCount = this.data.artifacts.length;
+
+        return `
+            <div class="dungeon-quick">
+                <div class="dq-level">
+                    <span class="dq-icon">🏰</span>
+                    <span class="dq-floor">Floor ${this.data.currentLevel}</span>
+                </div>
+                <div class="dq-stats">
+                    <span>👹 ${bossCount}</span>
+                    <span>⚔️ ${artifactCount}</span>
+                    <span>📜 ${this.data.loreUnlocked.length}</span>
+                </div>
+                <button class="btn btn-small btn-primary" onclick="App.switchView('dungeon')">
+                    Enter Dungeon
+                </button>
+            </div>
+        `;
     }
+};
