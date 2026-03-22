@@ -3,111 +3,241 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QuestBorne - Rise Through Discipline</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/login.css">
-    <link rel="stylesheet" href="css/responsive.css">
-    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>Quest of Habits - RPG Task Tracker</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Cinzel:wght@400;700;900&family=Raleway:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
-<body class="login-body">
-    <div class="particles" id="particles"></div>
+<body>
+    <!-- LOADING SCREEN -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
+            <h1 class="game-title">Quest of Habits</h1>
+            <div class="loading-bar-container">
+                <div class="loading-bar"></div>
+            </div>
+            <p class="loading-text">Forging your destiny...</p>
+        </div>
+    </div>
 
-    <div class="login-container">
-        <div class="login-card">
-            <div class="logo-section">
-                <div class="logo-icon">⚔️</div>
-                <h1 class="logo-title">QuestBorne</h1>
-                <p class="logo-subtitle">Rise Through Discipline</p>
+    <!-- LOGIN SCREEN -->
+    <div id="auth-screen" class="screen hidden">
+        <div class="auth-container">
+            <div class="auth-header">
+                <div class="logo-emblem">⚔️</div>
+                <h1 class="game-title">Quest of Habits</h1>
+                <p class="auth-subtitle">Forge your destiny through discipline</p>
+            </div>
+            
+            <div class="auth-tabs">
+                <button class="auth-tab active" data-tab="login">Login</button>
+                <button class="auth-tab" data-tab="register">Register</button>
             </div>
 
-            <!-- Login Form -->
-            <form id="login-form" class="auth-form active">
-                <h2>Welcome Back, Hero</h2>
-                <div class="input-group">
-                    <label for="login-email">Email</label>
-                    <input type="email" id="login-email" placeholder="hero@questborne.com" required>
-                    <span class="input-icon">📧</span>
+            <form id="login-form" class="auth-form">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="login-username" required autocomplete="username">
                 </div>
-                <div class="input-group">
-                    <label for="login-password">Password</label>
-                    <input type="password" id="login-password" placeholder="Your secret phrase..." required>
-                    <span class="input-icon">🔒</span>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="login-password" required autocomplete="current-password">
                 </div>
                 <button type="submit" class="btn-primary">Enter the Realm</button>
-                <p class="auth-switch">
-                    New to QuestBorne?
-                    <a href="#" id="show-register">Create Your Hero</a>
-                </p>
-                <div id="login-error" class="error-message"></div>
+                <p id="login-error" class="error-msg hidden"></p>
             </form>
 
-            <!-- Register Form -->
-            <form id="register-form" class="auth-form">
-                <h2>Forge Your Legend</h2>
-                <div class="input-group">
-                    <label for="reg-username">Hero Name</label>
-                    <input type="text" id="reg-username" placeholder="What shall they call you?" required minlength="3">
-                    <span class="input-icon">🛡️</span>
+            <form id="register-form" class="auth-form hidden">
+                <div class="form-group">
+                    <label>Choose your Username</label>
+                    <input type="text" id="reg-username" required minlength="3" autocomplete="username">
                 </div>
-                <div class="input-group">
-                    <label for="reg-email">Email</label>
-                    <input type="email" id="reg-email" placeholder="hero@questborne.com" required>
-                    <span class="input-icon">📧</span>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="reg-password" required minlength="4" autocomplete="new-password">
                 </div>
-                <div class="input-group">
-                    <label for="reg-password">Password</label>
-                    <input type="password" id="reg-password" placeholder="Min 6 characters..." required minlength="6">
-                    <span class="input-icon">��</span>
+                <div class="form-group">
+                    <label>Confirm Password</label>
+                    <input type="password" id="reg-password-confirm" required autocomplete="new-password">
                 </div>
-                <div class="input-group">
-                    <label for="reg-password-confirm">Confirm Password</label>
-                    <input type="password" id="reg-password-confirm" placeholder="Repeat your phrase..." required>
-                    <span class="input-icon">🔒</span>
+                <div class="form-group">
+                    <label>Name your Hero</label>
+                    <input type="text" id="reg-heroname" required minlength="2">
                 </div>
-
-                <!-- Class Selection -->
-                <div class="class-selection">
-                    <label>Choose Your Path</label>
-                    <div class="class-options">
-                        <div class="class-option" data-class="warrior">
-                            <span class="class-icon">⚔️</span>
-                            <span class="class-name">Warrior</span>
-                            <span class="class-desc">+2 STR, +1 CON</span>
+                <div class="form-group">
+                    <label>Choose your Class</label>
+                    <div class="class-selection">
+                        <div class="class-option selected" data-class="warrior">
+                            <div class="class-icon">🗡️</div>
+                            <div class="class-name">Warrior</div>
+                            <div class="class-desc">+2 STR, +1 VIT</div>
                         </div>
                         <div class="class-option" data-class="ranger">
-                            <span class="class-icon">🏹</span>
-                            <span class="class-name">Ranger</span>
-                            <span class="class-desc">+2 DEX, +1 WIS</span>
+                            <div class="class-icon">🏹</div>
+                            <div class="class-name">Ranger</div>
+                            <div class="class-desc">+2 DEX, +1 WIS</div>
                         </div>
                         <div class="class-option" data-class="mage">
-                            <span class="class-icon">🔮</span>
-                            <span class="class-name">Mage</span>
-                            <span class="class-desc">+2 INT, +1 WIS</span>
+                            <div class="class-icon">🔮</div>
+                            <div class="class-name">Mage</div>
+                            <div class="class-desc">+2 INT, +1 WIS</div>
                         </div>
                         <div class="class-option" data-class="bard">
-                            <span class="class-icon">🎵</span>
-                            <span class="class-name">Bard</span>
-                            <span class="class-desc">+2 CHA, +1 DEX</span>
+                            <div class="class-icon">🎵</div>
+                            <div class="class-name">Bard</div>
+                            <div class="class-desc">+2 CHA, +1 DEX</div>
                         </div>
                     </div>
-                    <input type="hidden" id="reg-class" value="">
                 </div>
-
                 <button type="submit" class="btn-primary">Begin Your Quest</button>
-                <p class="auth-switch">
-                    Already a hero?
-                    <a href="#" id="show-login">Return to Login</a>
-                </p>
-                <div id="register-error" class="error-message"></div>
+                <p id="register-error" class="error-msg hidden"></p>
             </form>
         </div>
     </div>
 
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script src="js/firebase-config.js"></script>
-    <script src="js/auth.js"></script>
-</body>
-</html>
+    <!-- MAIN APP -->
+    <div id="app-screen" class="screen hidden">
+        <!-- TOP NAV -->
+        <nav class="top-nav">
+            <div class="nav-left">
+                <span class="nav-logo">⚔️</span>
+                <span class="nav-title">Quest of Habits</span>
+            </div>
+            <div class="nav-right">
+                <span id="nav-username" class="nav-user"></span>
+                <button id="logout-btn" class="btn-small">Logout</button>
+            </div>
+        </nav>
+
+        <!-- CHARACTER SUMMARY BAR -->
+        <div class="character-bar">
+            <div class="char-bar-left">
+                <div class="char-avatar-small" id="char-avatar-nav">🗡️</div>
+                <div class="char-bar-info">
+                    <span class="char-bar-name" id="char-bar-name">Hero</span>
+                    <span class="char-bar-level" id="char-bar-level">Lv. 1</span>
+                </div>
+            </div>
+            <div class="char-bar-right">
+                <div class="xp-bar-mini">
+                    <div class="xp-bar-fill" id="xp-bar-fill" style="width: 0%"></div>
+                    <span class="xp-bar-text" id="xp-bar-text">0 / 100 XP</span>
+                </div>
+                <div class="hp-bar-mini">
+                    <div class="hp-bar-fill" id="hp-bar-fill" style="width: 100%"></div>
+                    <span class="hp-bar-text" id="hp-bar-text">100 / 100 HP</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT AREA -->
+        <div class="main-content">
+            <!-- BOTTOM MOBILE NAV / SIDEBAR -->
+            <div class="sidebar">
+                <button class="nav-btn active" data-view="dashboard">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-label">Dashboard</span>
+                </button>
+                <button class="nav-btn" data-view="tasks">
+                    <span class="nav-icon">📋</span>
+                    <span class="nav-label">Tasks</span>
+                </button>
+                <button class="nav-btn" data-view="habits">
+                    <span class="nav-icon">🔄</span>
+                    <span class="nav-label">Habits</span>
+                </button>
+                <button class="nav-btn" data-view="character">
+                    <span class="nav-icon">👤</span>
+                    <span class="nav-label">Hero</span>
+                </button>
+                <button class="nav-btn" data-view="dungeon">
+                    <span class="nav-icon">🏰</span>
+                    <span class="nav-label">Dungeon</span>
+                </button>
+                <button class="nav-btn" data-view="lore">
+                    <span class="nav-icon">📜</span>
+                    <span class="nav-label">Lore</span>
+                </button>
+            </div>
+
+            <!-- VIEWS -->
+            <div class="view-container">
+
+                <!-- DASHBOARD VIEW -->
+                <div id="view-dashboard" class="view active">
+                    <h2 class="view-title">⚔️ Dashboard</h2>
+                    
+                    <div class="dashboard-grid">
+                        <div class="dash-card streak-card">
+                            <div class="dash-card-icon">🔥</div>
+                            <div class="dash-card-value" id="dash-streak">0</div>
+                            <div class="dash-card-label">Day Streak</div>
+                        </div>
+                        <div class="dash-card tasks-card">
+                            <div class="dash-card-icon">✅</div>
+                            <div class="dash-card-value" id="dash-tasks-done">0</div>
+                            <div class="dash-card-label">Tasks Today</div>
+                        </div>
+                        <div class="dash-card level-card">
+                            <div class="dash-card-icon">⭐</div>
+                            <div class="dash-card-value" id="dash-level">1</div>
+                            <div class="dash-card-label">Hero Level</div>
+                        </div>
+                        <div class="dash-card dungeon-card">
+                            <div class="dash-card-icon">🏰</div>
+                            <div class="dash-card-value" id="dash-dungeon">1</div>
+                            <div class="dash-card-label">Dungeon Floor</div>
+                        </div>
+                    </div>
+
+                    <div class="dash-section">
+                        <h3>📋 Today's Quests</h3>
+                        <div id="dash-today-tasks" class="dash-task-list">
+                            <p class="empty-state">No quests for today. Add some tasks!</p>
+                        </div>
+                    </div>
+
+                    <div class="dash-section">
+                        <h3>🔄 Daily Habits</h3>
+                        <div id="dash-today-habits" class="dash-task-list">
+                            <p class="empty-state">No habits tracked yet. Start building good ones!</p>
+                        </div>
+                    </div>
+
+                    <div class="dash-section">
+                        <h3>🏆 Recent Artifacts</h3>
+                        <div id="dash-recent-artifacts" class="artifact-showcase">
+                            <p class="empty-state">Delve into dungeons to discover legendary artifacts!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TASKS VIEW -->
+                <div id="view-tasks" class="view">
+                    <div class="view-header">
+                        <h2 class="view-title">📋 Quests</h2>
+                        <button id="add-task-btn" class="btn-primary btn-add">+ New Quest</button>
+                    </div>
+
+                    <!-- Add Task Modal -->
+                    <div id="task-modal" class="modal hidden">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h3>Create New Quest</h3>
+                                <button class="modal-close" data-close="task-modal">&times;</button>
+                            </div>
+                            <form id="task-form">
+                                <div class="form-group">
+                                    <label>Quest Name</label>
+                                    <input type="text" id="task-name" required placeholder="e.g., Complete project report">
+                                </div>
+                                <div class="form-group">
+                                    <label>Description</label>
+                                    <textarea id="task-desc" placeholder="Details about this quest..."></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label>Category</label>
+                                    <select id="task-category">
+                                        <option value="work">💼 Work</option>
+                                        <option value="fitness">💪 Fitness</option>
+                                        <option value="music">🎵 Music</option>
+                                        <option value="learning">📚 
