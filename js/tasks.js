@@ -1,3 +1,4 @@
+console.log('TASKS.JS LOADED');
 // ================================
 // Tasks System (Placeholder)
 // Will be fully implemented in Segment 3
