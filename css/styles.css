@@ -552,3 +552,88 @@ h1, h2, h3, h4 {
 .flex-between { justify-content: space-between; }
 .flex-center { justify-content: center; align-items: center; }
 .gap-1 { gap: var(--space-md); }
+
+/* ================================
+   Account Settings Styles
+================================ */
+.account-info {
+    background: var(--bg-medium);
+    padding: var(--space-md);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-lg);
+}
+
+.account-info p {
+    margin-bottom: var(--space-sm);
+    color: var(--text-secondary);
+}
+
+.account-info p:last-child {
+    margin-bottom: 0;
+}
+
+.account-info strong {
+    color: var(--text-primary);
+}
+
+/* ================================
+   Leaderboard Styles
+================================ */
+.leaderboard {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.leaderboard-header {
+    background: var(--bg-medium);
+    padding: var(--space-md);
+    display: grid;
+    grid-template-columns: 50px 1fr repeat(3, 80px);
+    gap: var(--space-md);
+    font-weight: 500;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.leaderboard-row {
+    padding: var(--space-md);
+    display: grid;
+    grid-template-columns: 50px 1fr repeat(3, 80px);
+    gap: var(--space-md);
+    border-bottom: 1px solid var(--bg-light);
+    transition: var(--transition);
+}
+
+.leaderboard-row:hover {
+    background: var(--bg-medium);
+}
+
+.leaderboard-row.current-user {
+    background: rgba(233, 69, 96, 0.1);
+    border-left: 3px solid var(--primary);
+}
+
+.leaderboard-rank {
+    font-weight: 700;
+    color: var(--accent);
+}
+
+.leaderboard-rank.gold { color: #ffd700; }
+.leaderboard-rank.silver { color: #c0c0c0; }
+.leaderboard-rank.bronze { color: #cd7f32; }
+
+/* ================================
+   Mobile Leaderboard
+================================ */
+@media (max-width: 768px) {
+    .leaderboard-header,
+    .leaderboard-row {
+        grid-template-columns: 40px 1fr 60px;
+    }
+    
+    .leaderboard-header > *:nth-child(n+4),
+    .leaderboard-row > *:nth-child(n+4) {
+        display: none;
+    }
+}
