@@ -1,0 +1,316 @@
+/* ============================================
+   CHARACTER SHEET STYLES
+   ============================================ */
+
+.character-sheet {
+    display: grid;
+    gap: 24px;
+}
+
+/* Identity Card */
+.char-identity-card {
+    background: linear-gradient(135deg, var(--bg-card), var(--bg-tertiary));
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 30px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.char-large-avatar {
+    font-size: 5rem;
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(251, 191, 36, 0.1);
+    border: 2px solid var(--accent-gold-dim);
+    border-radius: 50%;
+}
+
+.char-identity-info {
+    flex: 1;
+    min-width: 200px;
+}
+
+.char-identity-info h2 {
+    font-size: 1.8rem;
+    color: var(--accent-gold);
+}
+
+.char-title {
+    color: var(--text-muted);
+    font-style: italic;
+    margin-bottom: 4px;
+}
+
+.char-class-display {
+    color: var(--accent-purple);
+    font-weight: 600;
+}
+
+.char-level-badge {
+    display: inline-block;
+    margin-top: 8px;
+    background: linear-gradient(135deg, var(--accent-gold), var(--accent-orange));
+    color: var(--bg-primary);
+    padding: 4px 16px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.xp-bar-large {
+    width: 100%;
+    height: 14px;
+    background: var(--bg-secondary);
+    border-radius: 7px;
+    overflow: hidden;
+    position: relative;
+    margin-top: 10px;
+}
+
+.xp-bar-fill-large {
+    height: 100%;
+    background: linear-gradient(90deg, var(--xp-blue), var(--accent-purple), var(--accent-gold));
+    border-radius: 7px;
+    transition: width var(--transition-slow);
+}
+
+.xp-bar-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: white;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 14px;
+}
+
+.stat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 20px;
+    text-align: center;
+    transition: all var(--transition-fast);
+}
+
+.stat-card:hover {
+    border-color: var(--accent-gold-dim);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.stat-card .stat-icon {
+    font-size: 2rem;
+    margin-bottom: 8px;
+}
+
+.stat-card .stat-name {
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.stat-card .stat-value {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--accent-gold);
+    font-family: var(--font-display);
+    line-height: 1.2;
+    margin: 4px 0;
+}
+
+.stat-bar-container {
+    height: 6px;
+    background: var(--bg-secondary);
+    border-radius: 3px;
+    overflow: hidden;
+    margin: 8px 0;
+}
+
+.stat-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-gold-dim), var(--accent-gold));
+    border-radius: 3px;
+    transition: width var(--transition-normal);
+}
+
+.stat-card .stat-desc {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+}
+
+/* Combat Stats */
+.combat-stats-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 24px;
+}
+
+.combat-stats-card h3 {
+    font-size: 1.2rem;
+    margin-bottom: 16px;
+    color: var(--text-primary);
+    font-family: var(--font-display);
+}
+
+.combat-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+}
+
+.combat-stat {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    background: var(--bg-secondary);
+    border-radius: 8px;
+}
+
+.cs-label {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.cs-value {
+    color: var(--accent-gold);
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+/* Equipped Artifacts */
+.equipped-artifacts-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 24px;
+}
+
+.equipped-artifacts-card h3 {
+    font-size: 1.2rem;
+    margin-bottom: 16px;
+    color: var(--text-primary);
+    font-family: var(--font-display);
+}
+
+.artifact-slots {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+}
+
+.artifact-slot {
+    background: var(--bg-secondary);
+    border: 2px dashed var(--border-color);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    transition: all var(--transition-fast);
+    cursor: pointer;
+}
+
+.artifact-slot:hover {
+    border-color: var(--accent-gold-dim);
+}
+
+.artifact-slot.empty .slot-icon {
+    font-size: 1.5rem;
+    opacity: 0.3;
+    display: block;
+    margin-bottom: 6px;
+}
+
+.artifact-slot.empty .slot-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.artifact-slot.equipped {
+    border-style: solid;
+    border-color: var(--accent-purple);
+    background: rgba(139, 92, 246, 0.1);
+}
+
+.artifact-slot.equipped .slot-icon {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.artifact-slot.equipped .slot-label {
+    font-size: 0.75rem;
+    color: var(--accent-purple);
+    font-weight: 600;
+}
+
+.artifact-slot .artifact-name {
+    font-size: 0.8rem;
+    color: var(--accent-gold);
+    font-weight: 600;
+    margin-top: 4px;
+}
+
+.artifact-slot .artifact-bonus {
+    font-size: 0.7rem;
+    color: var(--accent-green);
+}
+
+/* Level Up Modal */
+.levelup-modal {
+    text-align: center;
+    max-width: 400px;
+}
+
+.levelup-content {
+    padding: 20px;
+}
+
+.levelup-burst {
+    font-size: 5rem;
+    animation: levelUpBurst 1s ease;
+}
+
+@keyframes levelUpBurst {
+    0% { transform: scale(0) rotate(0deg); }
+    50% { transform: scale(1.5) rotate(180deg); }
+    100% { transform: scale(1) rotate(360deg); }
+}
+
+.levelup-content h1 {
+    font-size: 2.5rem;
+    color: var(--accent-gold);
+    margin: 10px 0;
+    text-shadow: 0 0 30px rgba(251, 191, 36, 0.5);
+}
+
+.levelup-rewards {
+    margin: 20px 0;
+    text-align: left;
+    background: var(--bg-secondary);
+    border-radius: 10px;
+    padding: 16px;
+}
+
+.levelup-reward-item {
+    padding: 4px 0;
+    color: var(--accent-green);
+    font-size: 0.9rem;
+}
