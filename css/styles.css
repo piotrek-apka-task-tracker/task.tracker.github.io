@@ -1601,3 +1601,109 @@ h1, h2, h3, h4 {
         grid-template-columns: 1fr;
     }
 }
+/* ================================
+   Segment 5: Character Polish
+================================ */
+.character-sub {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    margin-top: var(--space-xs);
+}
+
+.quick-today {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    margin-top: 2px;
+}
+
+/* Stat “pulse” on level-up */
+.stat-card.highlight {
+    animation: statPulse 0.8s ease-in-out 0s 2;
+    box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.15);
+}
+
+@keyframes statPulse {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
+/* Activity Log */
+.activity-section {
+    background: var(--bg-card);
+    padding: var(--space-lg);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-lg);
+    border: 1px solid var(--bg-light);
+}
+
+.activity-section h3 {
+    color: var(--accent);
+    margin-bottom: var(--space-md);
+    text-align: center;
+}
+
+.activity-log {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.log-entry {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-md);
+    padding: var(--space-sm) var(--space-md);
+    background: var(--bg-medium);
+    border: 1px solid var(--bg-light);
+    border-radius: var(--radius-md);
+}
+
+.log-msg {
+    color: var(--text-primary);
+    font-size: 0.9rem;
+}
+
+.log-time {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
+
+/* Level-up modal */
+.levelup-subtitle {
+    color: var(--text-secondary);
+    margin-bottom: var(--space-md);
+}
+
+.levelup-grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-lg);
+}
+
+.levelup-row {
+    display: grid;
+    grid-template-columns: 1.2fr 0.7fr 0.2fr 0.7fr 0.7fr;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    background: var(--bg-medium);
+    border: 1px solid var(--bg-light);
+    border-radius: var(--radius-md);
+}
+
+.levelup-label { color: var(--text-primary); }
+.levelup-before, .levelup-after { color: var(--text-secondary); text-align: right; }
+.levelup-arrow { color: var(--text-muted); text-align: center; }
+.levelup-delta { text-align: right; font-weight: 600; }
+.levelup-delta.pos { color: var(--success); }
+.levelup-delta.neg { color: var(--danger); }
+
+@media (max-width: 480px) {
+    .levelup-row {
+        grid-template-columns: 1.4fr 0.6fr 0.2fr 0.6fr 0.7fr;
+        font-size: 0.85rem;
+    }
+}
