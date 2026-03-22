@@ -1,3 +1,4 @@
+console.log('CHARACTER.JS LOADED');
 // ================================
 // Character System (Placeholder)
 // Will be fully implemented in Segment 4
