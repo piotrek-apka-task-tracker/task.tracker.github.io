@@ -1,109 +1,168 @@
-// ============================================
+// ================================
 // CHARACTER SYSTEM
-// ============================================
-
+// ================================
 const CharacterSystem = {
-    classIcons: {
-        warrior: '⚔️',
-        ranger: '🏹',
-        mage: '🔮',
-        bard: '🎵'
-    },
-
-    // XP required for a given level
-    xpForLevel(level) {
-        return Math.floor(100 * Math.pow(1.15, level - 1));
-    },
-
-    // Get title based on level
-    getTitle(level) {
-        if (level < 5) return 'Novice Adventurer';
-        if (level < 10) return 'Apprentice Hero';
-        if (level < 15) return 'Journeyman Champion';
-        if (level < 20) return 'Seasoned Warrior';
-        if (level < 30) return 'Veteran Conqueror';
-        if (level < 40) return 'Master of Discipline';
-        if (level < 50) return 'Grandmaster of Will';
-        if (level < 75) return 'Legendary Questborne';
-        if (level < 100) return 'Mythical Ascendant';
-        return 'Eternal Legend';
-    },
-
-    // Award XP and check for level up
-    async addXP(userData, amount, statType) {
-        const character = userData.character;
-        character.xp += amount;
-        character.totalXp = (character.totalXp || 0) + amount;
-
-        // Add stat points
-        if (statType && character.stats[statType] !== undefined) {
-            const statGain = this.getStatGain(amount);
-            character.stats[statType] += statGain;
+    classData: {
+        warrior: {
+            name: "Warrior",
+            emoji: "🗡️",
+            bonusStats: { strength: 2, vitality: 1 },
+            skillName: "Power Strike",
+            skillDesc: "Deal 150% damage",
+            skillMultiplier: 1.5
+        },
+        ranger: {
+            name: "Ranger",
+            emoji: "🏹",
+            bonusStats: { dexterity: 2, wisdom: 1 },
+            skillName: "Precise Shot",
+            skillDesc: "High crit chance attack",
+            skillMultiplier: 1.2,
+            skillCritBonus: 30
+        },
+        mage: {
+            name: "Mage",
+            emoji: "🔮",
+            bonusStats: { intelligence: 2, wisdom: 1 },
+            skillName: "Arcane Blast",
+            skillDesc: "Magic-based damage",
+            skillMultiplier: 1.8,
+            usesMagic: true
+        },
+        bard: {
+            name: "Bard",
+            emoji: "🎵",
+            bonusStats: { charisma: 2, dexterity: 1 },
+            skillName: "Inspiring Melody",
+            skillDesc: "Heal 20% HP and attack",
+            skillMultiplier: 1.0,
+            healsPercent: 20
         }
-
-        // Check for level up(s)
-        const levelUps = [];
-        while (character.xp >= character.xpToNext) {
-            character.xp -= character.xpToNext;
-            character.level += 1;
-            character.xpToNext = this.xpForLevel(character.level);
-            character.title = this.getTitle(character.level);
-
-            // Bonus stats on level up
-            const levelUpBonuses = this.getLevelUpBonuses(character);
-            Object.entries(levelUpBonuses).forEach(([stat, bonus]) => {
-                character.stats[stat] += bonus;
-            });
-
-            // Increase max HP
-            character.maxHp = 80 + (character.stats.constitution * 8) + (character.level * 5);
-            character.hp = character.maxHp;
-
-            levelUps.push({
-                level: character.level,
-                bonuses: levelUpBonuses
-            });
-        }
-
-        // Update max HP
-        character.maxHp = 80 + (character.stats.constitution * 8) + (character.level * 5);
-
-        return levelUps;
     },
 
-    getStatGain(xpAmount) {
-        if (xpAmount >= 100) return 3;
-        if (xpAmount >= 50) return 2;
-        if (xpAmount >= 25) return 1;
-        return 1;
-    },
+    createNewCharacter(name, heroClass) {
+        const classInfo = this.classData[heroClass];
+        const baseStats = {
+            strength: 5,
+            dexterity: 5,
+            intelligence: 5,
+            wisdom: 5,
+            charisma: 5,
+            vitality: 5
+        };
 
-    getLevelUpBonuses(character) {
-        // Small bonus to all stats on level up
+        // Apply class bonuses
+        Object.keys(classInfo.bonusStats).forEach(stat => {
+            baseStats[stat] += classInfo.bonusStats[stat];
+        });
+
         return {
-            strength: 1,
-            dexterity: 1,
-            constitution: 1,
-            intelligence: 1,
-            wisdom: 1,
-            charisma: 1
+            name: name,
+            class: heroClass,
+            level: 1,
+            xp: 0,
+            xpToNext: 100,
+            stats: baseStats,
+            hp: 100,
+            maxHP: 100,
+            statPoints: 0 // We won't use manual stat points - stats grow from tasks
         };
     },
 
-    // Difficulty XP rewards
-    difficultyXP: {
-        easy: 10,
-        medium: 25,
-        hard: 50,
-        epic: 100
+    // Calculate XP needed for next level
+    getXPForLevel(level) {
+        return Math.floor(100 * Math.pow(1.15, level - 1));
     },
 
-    // Habit XP
-    habitXP: {
-        positive: 15,
-        negative_success: 20, // Avoided bad habit
-        negative_fail: -10    // Gave in to bad habit
+    // Calculate combat stats from character stats + artifacts
+    getCombatStats(userData) {
+        const char = userData.character;
+        const stats = char.stats;
+        const artifacts = userData.artifacts || [];
+
+        let attack = stats.strength * 2 + stats.dexterity * 0.5;
+        let defense = stats.vitality * 1.5 + stats.strength * 0.5;
+        let maxHP = 80 + stats.vitality * 10 + char.level * 5;
+        let speed = 5 + stats.dexterity * 1.2 + stats.wisdom * 0.3;
+        let crit = 5 + stats.dexterity * 0.5 + stats.wisdom * 0.3;
+        let magic = stats.intelligence * 2 + stats.wisdom * 0.8;
+
+        // Apply artifact bonuses
+        artifacts.forEach(art => {
+            if (art.bonus.attack) attack += art.bonus.attack;
+            if (art.bonus.defense) defense += art.bonus.defense;
+            if (art.bonus.maxHP) maxHP += art.bonus.maxHP;
+            if (art.bonus.speed) speed += art.bonus.speed;
+            if (art.bonus.crit) crit += art.bonus.crit;
+            if (art.bonus.magic) magic += art.bonus.magic;
+        });
+
+        return {
+            attack: Math.floor(attack),
+            defense: Math.floor(defense),
+            maxHP: Math.floor(maxHP),
+            speed: Math.floor(speed),
+            crit: Math.min(Math.floor(crit), 75), // cap at 75%
+            magic: Math.floor(magic)
+        };
+    },
+
+    // Calculate total power rating
+    getPowerRating(userData) {
+        const combat = this.getCombatStats(userData);
+        return Math.floor(
+            combat.attack * 1.5 + 
+            combat.defense * 1.2 + 
+            combat.maxHP * 0.1 + 
+            combat.speed * 0.8 + 
+            combat.crit * 0.5 + 
+            combat.magic * 1.0
+        );
+    },
+
+    // Get floor difficulty rating
+    getFloorDifficulty(floor) {
+        return Math.floor(15 + (floor - 1) * 12 + Math.pow(floor, 1.3));
+    },
+
+    // Add XP to character and handle level ups
+    addXP(userData, amount, statName) {
+        const char = userData.character;
+        char.xp += amount;
+        userData.stats.totalXPEarned += amount;
+
+        // Add stat point for the chosen stat
+        const statGain = Math.max(1, Math.floor(amount / 15));
+        if (char.stats[statName] !== undefined) {
+            char.stats[statName] += statGain;
+        }
+
+        // Check for level up
+        let leveled = false;
+        while (char.xp >= char.xpToNext) {
+            char.xp -= char.xpToNext;
+            char.level++;
+            char.xpToNext = this.getXPForLevel(char.level);
+            leveled = true;
+
+            // Bonus stats on level up
+            Object.keys(char.stats).forEach(stat => {
+                char.stats[stat] += 1;
+            });
+        }
+
+        // Recalculate max HP
+        const combat = this.getCombatStats(userData);
+        char.maxHP = combat.maxHP;
+        char.hp = Math.min(char.hp, char.maxHP);
+
+        return { leveled, statGain, statName };
+    },
+
+    // Heal character to full
+    fullHeal(userData) {
+        const combat = this.getCombatStats(userData);
+        userData.character.maxHP = combat.maxHP;
+        userData.character.hp = combat.maxHP;
     }
 };
-
-window.CharacterSystem = CharacterSystem;
