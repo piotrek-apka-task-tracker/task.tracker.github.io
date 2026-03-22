@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuestForge - RPG Task Tracker</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Inter:wght@300;400;500;600;700&family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="app">
+        <!-- Login Screen -->
+        <div id="login-screen" class="screen active">
+            <div class="login-container">
+                <div class="logo-section">
+                    <div class="logo-icon">⚔️</div>
+                    <h1 class="game-title">QuestForge</h1>
+                    <p class="game-subtitle">Forge Your Legend Through Daily Quests</p>
+                </div>
+                <div class="auth-box">
+                    <div class="auth-tabs">
+                        <button class="auth-tab active" data-tab="login">Sign In</button>
+                        <button class="auth-tab" data-tab="register">Create Account</button>
+                    </div>
+                    <form id="login-form" class="auth-form active">
+                        <div class="input-group">
+                            <label>Username</label>
+                            <input type="text" id="login-username" required autocomplete="username">
+                        </div>
+                        <div class="input-group">
+                            <label>Password</label>
+                            <input type="password" id="login-password" required autocomplete="current-password">
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-full">Enter the Realm</button>
+                        <p id="login-error" class="error-msg"></p>
+                    </form>
+                    <form id="register-form" class="auth-form">
+                        <div class="input-group">
+                            <label>Choose Username</label>
+                            <input type="text" id="reg-username" required minlength="3" autocomplete="username">
+                        </div>
+                        <div class="input-group">
+                            <label>Password</label>
+                            <input type="password" id="reg-password" required minlength="4" autocomplete="new-password">
+                        </div>
+                        <div class="input-group">
+                            <label>Confirm Password</label>
+                            <input type="password" id="reg-password-confirm" required autocomplete="new-password">
+                        </div>
+                        <div class="input-group">
+                            <label>Name Your Hero</label>
+                            <input type="text" id="reg-heroname" required minlength="2" placeholder="e.g. Aldric the Brave">
+                        </div>
+                        <div class="input-group">
+                            <label>Choose Your Class</label>
+                            <div class="class-selection">
+                                <button type="button" class="class-btn" data-class="warrior">
+                                    <span class="class-icon">🗡️</span>
+                                    <span class="class-name">Warrior</span>
+                                    <span class="class-bonus">+STR</span>
+                                </button>
+                                <button type="button" class="class-btn" data-class="mage">
+                                    <span class="class-icon">🔮</span>
+                                    <span class="class-name">Mage</span>
+                                    <span class="class-bonus">+INT</span>
+                                </button>
+                                <button type="button" class="class-btn" data-class="ranger">
+                                    <span class="class-icon">🏹</span>
+                                    <span class="class-name">Ranger</span>
+                                    <span class="class-bonus">+DEX</span>
+                                </button>
+                                <button type="button" class="class-btn" data-class="paladin">
+                                    <span class="class-icon">🛡️</span>
+                                    <span class="class-name">Paladin</span>
+                                    <span class="class-bonus">+CON</span>
+                                </button>
+                                <button type="button" class="class-btn" data-class="bard">
+                                    <span class="class-icon">🎵</span>
+                                    <span class="class-name">Bard</span>
+                                    <span class="class-bonus">+CHA</span>
+                                </button>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-full">Begin Your Journey</button>
+                        <p id="register-error" class="error-msg"></p>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main App -->
+        <div id="main-app" class="screen">
+            <!-- Top Navigation Bar -->
+            <nav class="top-nav">
+                <div class="nav-left">
+                    <span class="nav-logo">⚔️ QuestForge</span>
+                </div>
+                <div class="nav-center">
+                    <button class="nav-btn active" data-view="dashboard">
+                        <span class="nav-icon">📊</span>
+                        <span class="nav-label">Dashboard</span>
+                    </button>
+                    <button class="nav-btn" data-view="tasks">
+                        <span class="nav-icon">📋</span>
+                        <span class="nav-label">Quests</span>
+                    </button>
+                    <button class="nav-btn" data-view="habits">
+                        <span class="nav-icon">🔄</span>
+                        <span class="nav-label">Habits</span>
+                    </button>
+                    <button class="nav-btn" data-view="character">
+                        <span class="nav-icon">👤</span>
+                        <span class="nav-label">Hero</span>
+                    </button>
+                    <button class="nav-btn" data-view="dungeon">
+                        <span class="nav-icon">🏰</span>
+                        <span class="nav-label">Dungeon</span>
+                    </button>
+                    <button class="nav-btn" data-view="lore">
+                        <span class="nav-icon">📜</span>
+                        <span class="nav-label">Lore</span>
+                    </button>
+                </div>
+                <div class="nav-right">
+                    <span id="nav-hero-name" class="hero-name-small"></span>
+                    <button id="logout-btn" class="btn btn-small btn-danger">Logout</button>
+                </div>
+            </nav>
+
+            <!-- Mobile Bottom Navigation -->
+            <nav class="bottom-nav">
+                <button class="bottom-nav-btn active" data-view="dashboard">
+                    <span>📊</span><small>Home</small>
+                </button>
+                <button class="bottom-nav-btn" data-view="tasks">
+                    <span>📋</span><small>Quests</small>
+                </button>
+                <button class="bottom-nav-btn" data-view="habits">
+                    <span>🔄</span><small>Habits</small>
+                </button>
+                <button class="bottom-nav-btn" data-view="character">
+                    <span>👤</span><small>Hero</small>
+                </button>
+                <button class="bottom-nav-btn" data-view="dungeon">
+                    <span>🏰</span><small>Dungeon</small>
+                </button>
+                <button class="bottom-nav-btn" data-view="lore">
+                    <span>📜</span><small>Lore</small>
+                </button>
+            </nav>
+
+            <!-- Content Area -->
+            <main class="content-area">
+
+                <!-- DASHBOARD VIEW -->
+                <div id="view-dashboard" class="view active">
+                    <div class="dashboard-grid">
+                        <!-- Hero Summary Card -->
+                        <div class="card hero-summary-card">
+                            <div class="hero-avatar-section">
+                                <div id="dash-hero-avatar" class="hero-avatar-large"></div>
+                                <div class="hero-info">
+                                    <h2 id="dash-hero-name"></h2>
+                                    <p id="dash-hero-class" class="hero-class-label"></p>
+                                    <div class="hero-level-display">
+                                        <span class="level-badge" id="dash-hero-level">Lv. 1</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="xp-bar-container">
+                                <div class="xp-bar">
+                                    <div id="dash-xp-fill" class="xp-fill"></div>
+                                </div>
+                                <span id="dash-xp-text" class="xp-text">0 / 100 XP</span>
+                            </div>
+                            <div id="dash-stats-mini" class="stats-mini-grid"></div>
+                        </div>
+
+                        <!-- Today's Tasks -->
+                        <div class="card today-tasks-card">
+                            <h3>📋 Today's Quests</h3>
+                            <div id="dash-today-tasks" class="today-task-list"></div>
+                        </div>
+
+                        <!-- Habit Streaks -->
+                        <div class="card streaks-card">
+                            <h3>🔥 Active Streaks</h3>
+                            <div id="dash-streaks" class="streak-list"></div>
+                        </div>
+
+                        <!-- Dungeon Progress -->
+                        <div class="card dungeon-progress-card">
+                            <h3>🏰 Dungeon Progress</h3>
+                            <div id="dash-dungeon-info" class="dungeon-info-mini"></div>
+                            <button class="btn btn-primary" onclick="UI.switchView('dungeon')">Enter Dungeon</button>
+                        </div>
+
+                        <!-- Recent Artifacts -->
+                        <div class="card artifacts-card">
+                            <h3>⚔️ Latest Artifacts</h3>
+                            <div id="dash-artifacts" class="artifacts-mini-list"></div>
+                        </div>
+
+                        <!-- Motivational Quote -->
+                        <div class="card quote-card">
+                            <div id="daily-quote" class="daily-quote"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TASKS VIEW -->
+                <div id="view-tasks" class="view">
+                    <div class="view-header">
+                        <h2>📋 Quest Board</h2>
+                        <button id="add-task-btn" class="btn btn-primary">+ New Quest</button>
+                    </div>
+
+                    <!-- Add Task Modal -->
+                    <div id="task-modal" class="modal hidden">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h3 id="task-modal-title">Create New Quest</h3>
+                                <button class="modal-close" onclick="UI.closeModal('task-modal')">&times;</button>
+                            </div>
+                            <form id="task-form">
+                                <input type="hidden" id="task-edit-id">
+                                <div class="input-group">
+                                    <label>Quest Name</label>
+                                    <input type="text" id="task-name" required placeholder="e.g. Finish project report">
+                                </div>
+                                <div class="input-group">
+                                    <label>Description (optional)</label>
+                                    <textarea id="task-desc" rows="2" placeholder="Details about this quest..."></textarea>
+                                </div>
+                                <div class="input-group">
+                                    <label>Category</label>
+                                    <select id="task-category">
+                                        <option value="work">💼 Work</option>
+                                        <option value="fitness">💪 Fitness</option>
+                                        <option value="music">🎵 Music Practice</option>
+                                        <option value="learning">📚 Learning</option>
+                                        <option value="health">❤️ Health</option>
+                                        <option value="social">👥 Social</option>
+                                        <option value="creativity">🎨 Creativity</option>
+                                        <option value="chores">🏠 Chores</option>
+                                        <option value="other">⭐ Other</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label>Difficulty</label>
+                                    <div class="difficulty-select">
+                                        <button type="button" class="diff-btn active" data-diff="easy">Easy (10 XP)</button>
+                                        <button type="button" class="diff-btn" data-diff="medium">Medium (25 XP)</button>
+                                        <button type="button" class="diff-btn" data-diff="hard">Hard (50 XP)</button>
+                                        <button type="button" class="diff-btn" data-diff="epic">Epic (100 XP)</button>
+                                    </div>
+                                </div>
+                                <div class="input-group">
+                                    <label>Stat to Train</label>
+                                    <select id="task-stat">
+                                        <option value="strength">💪 Strength</option>
+                                        <option value="dexterity">🏃 Dexterity</option>
+                                        <option value="constitution">🛡️ Constitution</option>
+                                        <option value="intelligence">🧠 Intelligence</option>
+                                        <option value="wisdom">👁️ Wisdom</option>
+                                        <option value="charisma">✨ Charisma</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label>Due Date (optional)</label>
+                                    <input type="date" id="task-due">
+                                </div>
+                                <div class="input-group checkbox-group">
+                                    <label>
+                                        <input type="checkbox" id="task-recurring"> Recurring (Daily)
+                                    </label>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-full">Save Quest</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Task Filters -->
+                    <div class="task-filters">
+                        <button class="filter-btn active" data-filter="all">All</button>
+                        <button class="filter-btn" data-filter="active">Active</button>
+                        <button class="filter-btn" data-filter="completed">Completed</button>
+                        <button class="filter-btn" data-filter="work">💼 Work</button>
+                        <button class="filter-btn" data-filter="fitness">💪 Fitness</button>
+                        <button class="filter-btn" data-filter="music">🎵 Music</button>
+                    </div>
+
+                    <div id="task-list" class="task-list"></div>
+                </div>
+
+                <!-- HABITS VIEW -->
+                <div id="view-habits" class="view">
+                    <div class="view-header">
+                        <h2>🔄 Habit Forge</h2>
+                        <button id="add-habit-btn" class="btn btn-primary">+ New Habit</button>
+                    </div>
+
+                    <!-- Add Habit Modal -->
+                    <div id="habit-modal" class="modal hidden">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h3>Create New Habit</h3>
+                                <button class="modal-close" onclick="UI.closeModal('habit-modal')">&times;</button>
+                            </div>
+                            <form id="habit-form">
+                                <div class="input-group">
+                                    <label>Habit Name</label>
+                                    <input type="text" id="habit-name" required placeholder="e.g. Practice Bass Guitar">
+                                </div>
+                                <div class="input-group">
+                                    <label>Type</label>
+                                    <div class="habit-type-select">
+                                        <button type="button" class="habit-type-btn active" data-type="good">
+                                            ✅ Good Habit (Build)
+                                        </button>
+                                        <button type="button" class="habit-type-btn" data-type="bad">
+                                            ❌ Bad Habit (Break)
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="input-group">
+                                    <label>Stat to Train</label>
+                                    <select id="habit-stat">
+                                        <option value="strength">💪 Strength</option>
+                                        <option value="dexterity">🏃 Dexterity</option>
+                                        <option value="constitution">🛡️ Constitution</option>
+                                        <option value="intelligence">🧠 Intelligence</option>
+                                        <option value="wisdom">👁️ Wisdom</option>
+                                        <option value="charisma">✨ Charisma</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label>XP per completion</label>
+                                    <select id="habit-xp">
+                                        <option value="5">5 XP (Quick)</option>
+                                        <option value="10" selected>10 XP (Normal)</option>
+                                        <option value="20">20 XP (Challenging)</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-full">Create Habit</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="habits-container">
+                        <div class="habits-section">
+                            <h3>✅ Good Habits (Build These)</h3>
+                            <div id="good-habits-list" class="habit-list"></div>
+                        </div>
+                        <div class="habits-section">
+                            <h3>❌ Bad Habits (Break These)</h3>
+                            <p class="habit-hint">Click when you RESIST the urge. Your streak resets if you give in.</p>
+                            <div id="bad-habits-list" class="habit-list"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CHARACTER VIEW -->
+                <div id="view-character" class="view">
+                    <div class="character-sheet">
+                        <div class="char-header">
+                            <div id="char-avatar" class="hero-avatar-huge"></div>
+                            <div class="char-identity">
+                                <h2 id="char-name"></h2>
+                                <p id="char-class"></p>
+                                <div class="char-level-section">
+                                    <span id="char-level" class="level-badge-large"></span>
+                                    <div class="xp-bar-container">
+                                        <div class="xp-bar xp-bar-large">
+                                            <div id="char-xp-fill" class="xp-fill"></div>
+                                        </div>
+                                        <span id="char-xp-text" class="xp-text"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="char-stats-grid">
+                            <div class="stat-card" data-stat="strength">
+                                <div class="stat-icon">💪</div>
+                                <div class="stat-name">Strength</div>
+                                <div class="stat-value" id="stat-strength">10</div>
+                                <div class="stat-bar-container">
+                                    <div class="stat-bar">
+                                        <div class="stat-bar-fill" id="stat-bar-strength"></div>
+                                    </div>
+                                </div>
+                                <div class="stat-xp-text" id="stat-xp-strength"></div>
+                            </div>
+                            <div class="stat-card" data-stat="dexterity">
+                                <div class="stat-icon">🏃</div>
+                                <div class="stat-name">Dexterity</div>
+                                <div class="stat-value" id="stat-dexterity">10</div>
+                                <div class="stat-bar-container">
+                                    <div class="stat-bar">
+                                        <div class="stat-bar-fill" id="stat-bar-dexterity"></div>
+                                    </div>
+                                </div>
+                                <div class="stat-xp-text" id="stat-xp-dexterity"></div>
+                            </div>
+                            <div class="stat-card" data-stat="constitution">
+                                <div class="stat-icon">🛡️</div>
+                                <div class="stat-name">Constitution</div>
+                                <div class="stat-value" id="stat-constitution">10</div>
+                                <div class="stat-bar-container">
+                                    <div class="stat-bar">
+                                        <div class="stat-bar-fill" id="stat-bar-constitution"></div>
+                                    </div>
+                                </div>
+                                <div class="stat-xp-text" id="stat-xp-constitution"></div>
+                            </div>
+                            <div class="stat-card" data-stat="intelligence">
+                                <div class="stat-icon">🧠</div>
+                                <div class="stat-name">Intelligence</div>
+                                <div class="stat-value" id="stat-intelligence">10</div>
+                                <div class="stat-bar-container">
+                                    <div class="stat-bar">
+                                        <div class="stat-bar-fill" id="stat-bar-intelligence"></div>
+                                    </div>
+                                </div>
+                                <div class="stat-xp-text" id="stat-xp-intelligence"></div>
+                            </div>
+                            <div class="stat-card" data-stat="wisdom">
+                                <div class="stat-icon">👁️</div>
+                                <div class="stat-name">Wisdom</div>
+                                <div class="stat-value" id="stat-wisdom">10</div>
+                                <div class="stat-bar-container">
+                                    <div class="stat-bar">
+                                        <div class="stat-bar-fill" id="stat-bar-wisdom"></div>
+                                    </div>
+                                </div>
+                                <div class="stat-xp-text" id="stat-xp-wisdom"></div>
+                            </div>
+                            <div class="stat-card" data-stat="charisma">
+                                <div class="stat-icon">✨</div>
+                                <div class="stat-name">Charisma</div>
+                                <div class="stat-value" id="stat-charisma">10</div>
+                                <div class="stat-bar-container">
+                                    <div class="stat-bar">
+                                        <div class="stat-bar-fill" id="stat-bar-charisma"></div>
+                                    </div>
+                                </div>
+                                <div class="stat-xp-text" id="stat-xp-charisma"></div>
+                            </div>
+                        </div>
+
+                        <!-- Combat Stats -->
+                        <div class="combat-stats-section">
+                            <h3>⚔️ Combat Stats</h3>
+                            <div class="combat-stats-grid">
+                                <div class="combat-stat">
+                                    <span class="cs-label">❤️ HP</span>
+                                    <span class="cs-value" id="combat-hp"></span>
+                                </div>
+                                <div class="combat-stat">
+                                    <span class="cs-label">⚔️ Attack</span>
+                                    <span class="cs-value" id="combat-attack"></span>
+                                </div>
+                                <div class="combat-stat">
+                                    <span class="cs-label">🛡️ Defense</span>
+                                    <span class="cs-value" id="combat-defense"></span>
+                                </div>
+                                <div class="combat-stat">
+                                    <span class="cs-label">💨 Speed</span>
+                                    <span class="cs-value" id="combat-speed"></span>
+                                </div>
+                                <div class="combat-stat">
+                                    <span class="cs-label">🔮 Magic</span>
+                                    <span class="cs-value" id="combat-magic"></span>
+                                </div>
+                                <div class="combat-stat">
+                                    <span class="cs-label">🎯 Crit %</span>
+                                    <span class="cs-value" id="combat-crit"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Equipped Artifacts -->
+                        <div class="artifacts-section">
+                            <h3>🏆 Artifacts</h3>
+                            <div id="char-artifacts" class="char-artifacts-grid"></div>
+                        </div>
+
+                        <!-- Stats Summary -->
+                        <div class="stats-summary">
+                            <h3>📊 Lifetime Stats</h3>
+                            <div class="lifetime-stats" id="lifetime-stats"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DUNGEON VIEW -->
+                <div id="view-dungeon" class="view">
+                    <div class="dungeon-container">
+                        <!-- Dungeon Hub -->
+                        <div id="dungeon-hub" class="dungeon-section">
+                            <div class="dungeon-header">
+                                <h2>🏰 The Endless Depths</h2>
+                                <p class="dungeon-subtitle">Prove your worth in combat. Only the strong survive.</p>
+                            </div>
+                            <div class="dungeon-level-info">
+                                <div class="current-floor">
+                                    <span class="floor-label">Current Floor</span>
+                                    <span class="floor-number" id="current-floor">1</span>
+                                </div>
+                                <div class="deepest-floor">
+                                    <span class="floor-label">Deepest Reached</span>
+                                    <span class="floor-number" id="deepest-floor">0</span>
+                                </div>
+                            </div>
+                            <div id="floor-preview" class="floor-preview"></div>
+                            <div class="dungeon-actions">
+                                <button id="enter-floor-btn" class="btn btn-primary btn-large">
+                                    ⚔️ Enter Floor <span id="enter-floor-num">1</span>
+                                </button>
+                                <div id="power-warning" class="power-warning hidden"></div>
+                            </div>
+                        </div>
+
+                        <!-- Combat Screen -->
+                        <div id="combat-screen" class="dungeon-section hidden">
+                            <div class="combat-arena">
+                                <div class="combatant hero-combatant">
+                                    <div class="combatant-name" id="combat-hero-name"></div>
+                                    <div class="combatant-avatar" id="combat-hero-avatar"></div>
+                                    <div class="health-bar-combat">
+                                        <div class="health-fill hero-health" id="hero-health-bar"></div>
+                                        <span class="health-text" id="hero-health-text"></span>
+                                    </div>
+                                </div>
+                                <div class="vs-indicator">⚔️</div>
+                                <div class="combatant enemy-combatant">
+                                    <div class="combatant-name" id="combat-enemy-name"></div>
+                                    <div class="combatant-avatar" id="combat-enemy-avatar"></div>
+                                    <div class="health-bar-combat">
+                                        <div class="health-fill enemy-health" id="enemy-health-bar"></div>
+                                        <span class="health-text" id="enemy-health-text"></span>
+                                    </div>
+                                    <div class="enemy-level" id="enemy-level"></div>
+                                </div>
+                            </div>
+                            <div id="combat-log" class="combat-log"></div>
+                            <div class="combat-controls">
+                                <button id="btn-attack" class="combat-btn" onclick="Combat.playerAction('attack')">⚔️ Attack</button>
+                                <button id="btn-heavy" class="combat-btn" onclick="Combat.playerAction('heavy')">💥 Heavy Strike</button>
+                                <button id="btn-defend" class="combat-btn" onclick="Combat.playerAction('defend')">🛡️ Defend</button>
+                                <button id="btn-magic" class="combat-btn" onclick="Combat.playerAction('magic')">🔮 Magic</button>
+                            </div>
+                        </div>
+
+                        <!-- Victory Screen -->
+                        <div id="victory-screen" class="dungeon-section hidden">
+                            <div class="result-screen victory">
+                                <h2>⚔️ VICTORY! ⚔️</h2>
+                                <div id="victory-details"></div>
+                                <button class="btn btn-primary btn-large" id="victory-continue-btn">Continue</button>
+                            </div>
+                        </div>
+
+                        <!-- Defeat Screen -->
+                        <div id="defeat-screen" class="dungeon-section hidden">
+                            <div class="result-screen defeat">
+                                <h2>💀 DEFEATED 💀</h2>
+                                <p>Your hero falls... but rises again. Complete more quests to grow stronger!</p>
+                                <div id="defeat-details"></div>
+                                <button class="btn btn-primary btn-large" onclick="Dungeon.returnToHub()">Return to Hub</button>
+                            </div>
+                        </div>
+
+                        <!-- Boss Victory -->
+                        <div id="boss-victory-screen" class="dungeon-section hidden">
+                            <div class="result-screen boss-victory">
+                                <h2>🏆 BOSS DEFEATED! 🏆</h2>
+                                <div id="boss-victory-details"></div>
+                                <div id="artifact-reveal" class="artifact-reveal"></div>
+                                <div id="lore-reveal" class="lore-reveal"></div>
+                                <button class="btn btn-primary btn-large" onclick="Dungeon.returnToHub()">Claim Rewards</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LORE VIEW -->
+                <div id="view-lore" class="view">
+                    <div class="lore-container">
+                        <div class="lore-header">
+                            <h2>📜 The Chronicles of the Endless Depths</h2>
+                            <p>Discover the story as you conquer each floor's boss.</p>
+                        </div>
+                        <div id="lore-entries" class="lore-entries"></div>
+                        <div id="lore-locked" class="lore-locked">
+                            <p>🔒 Defeat more bosses to uncover the next chapter...</p>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+
+        <!-- Notification Toast -->
+        <div id="toast-container" class="toast-container"></div>
+
+        <!-- Level Up Overlay -->
+        <div id="levelup-overlay" class="overlay hidden">
+            <div class="levelup-content">
+                <div class="levelup-burst"></div>
+                <h2>⬆️ LEVEL UP! ⬆️</h2>
+                <p id="levelup-text"></p>
+                <button class="btn btn-primary" onclick="UI.closeLevelUp()">Continue</button>
+            </div>
+        </div>
+
+        <!-- Stat Up Notification -->
+        <div id="statup-overlay" class="overlay hidden">
+            <div class="statup-content">
+                <h3 id="statup-text"></h3>
+                <button class="btn btn-primary" onclick="UI.closeStatUp()">Nice!</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/lore.js"></script>
+    <script src="js/artifacts.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/character.js"></script>
+    <script src="js/tasks.js"></script>
+    <script src="js/dungeon.js"></script>
+    <script src="js/combat.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
