@@ -1,3 +1,4 @@
+console.log('DUNGEON.JS LOADED');
 // ================================
 // Dungeon System (Placeholder)
 // Will be fully implemented in Segment 6
