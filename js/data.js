@@ -3,6 +3,10 @@
 // ================================
 
 const GameData = {
+    // XP tuning (Segment 5)
+    xpBase: 100,       // used by calculateExpForLevel (same as before if kept at 100)
+    statXPBase: 50,    // used by Character.getStatXPRequired()
+
     // Character Stats
     stats: {
         strength: {
