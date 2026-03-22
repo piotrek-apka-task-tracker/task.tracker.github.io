@@ -1707,3 +1707,680 @@ h1, h2, h3, h4 {
         font-size: 0.85rem;
     }
 }
+/* ================================
+   Dungeon System Styles
+================================ */
+.dungeon-no-hero {
+    text-align: center;
+    padding: var(--space-xl);
+}
+
+.no-hero-icon {
+    font-size: 5rem;
+    margin-bottom: var(--space-lg);
+    opacity: 0.5;
+}
+
+.dungeon-no-hero h2 {
+    color: var(--accent);
+    margin-bottom: var(--space-md);
+}
+
+.dungeon-no-hero p {
+    color: var(--text-secondary);
+    margin-bottom: var(--space-lg);
+}
+
+/* Dungeon Main Layout */
+.dungeon-main {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.dungeon-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-lg);
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-lg);
+    border: 1px solid var(--bg-light);
+}
+
+.dungeon-level {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.level-icon {
+    font-size: 2.5rem;
+}
+
+.level-info h2 {
+    color: var(--accent);
+    margin-bottom: var(--space-xs);
+}
+
+.level-info p {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.dungeon-stats {
+    display: flex;
+    gap: var(--space-md);
+}
+
+.dstat {
+    padding: var(--space-sm) var(--space-md);
+    background: var(--bg-medium);
+    border-radius: var(--radius-md);
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+/* Hero Status in Dungeon */
+.dungeon-hero-status {
+    padding: var(--space-lg);
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-lg);
+    border: 1px solid var(--bg-light);
+}
+
+.hero-bars {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+}
+
+.hero-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.bar-label {
+    min-width: 50px;
+    font-size: 0.9rem;
+}
+
+.bar-track {
+    flex: 1;
+    height: 16px;
+    background: var(--bg-medium);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.bar-track.hp .bar-fill {
+    background: linear-gradient(90deg, #ef4444, #f87171);
+}
+
+.bar-track.mp .bar-fill {
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+}
+
+.bar-fill {
+    height: 100%;
+    border-radius: 8px;
+    transition: width 0.3s ease;
+}
+
+.bar-value {
+    min-width: 70px;
+    text-align: right;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.hero-combat-stats {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-lg);
+    color: var(--text-secondary);
+}
+
+/* Dungeon Actions */
+.dungeon-actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+}
+
+.dungeon-actions .btn-large {
+    padding: var(--space-lg);
+    font-size: 1.2rem;
+}
+
+/* Floor Info */
+.floor-info {
+    margin-bottom: var(--space-lg);
+}
+
+.floor-details {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-lg);
+    padding: var(--space-md);
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    color: var(--text-secondary);
+}
+
+.floor-difficulty {
+    font-weight: 600;
+}
+
+.floor-difficulty.normal { color: var(--success); }
+.floor-difficulty.challenging { color: var(--warning); }
+.floor-difficulty.hard { color: #f97316; }
+.floor-difficulty.nightmare { color: var(--danger); }
+
+.boss-warning {
+    color: var(--danger);
+    font-weight: 600;
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+/* Dungeon Tabs */
+.dungeon-tabs {
+    display: flex;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+}
+
+.dtab {
+    flex: 1;
+    padding: var(--space-md);
+    background: var(--bg-card);
+    border: 1px solid var(--bg-light);
+    border-radius: var(--radius-md);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.dtab:hover {
+    border-color: var(--primary);
+}
+
+.dtab.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: var(--text-primary);
+}
+
+.dungeon-tab-content {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    border: 1px solid var(--bg-light);
+    min-height: 200px;
+}
+
+.tab-empty {
+    text-align: center;
+    padding: var(--space-xl);
+    color: var(--text-muted);
+}
+
+/* Artifacts */
+.artifacts-summary {
+    margin-bottom: var(--space-lg);
+    padding: var(--space-md);
+    background: var(--bg-medium);
+    border-radius: var(--radius-md);
+}
+
+.artifacts-summary h4 {
+    color: var(--accent);
+    margin-bottom: var(--space-sm);
+}
+
+.bonus-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+}
+
+.bonus-list span {
+    padding: var(--space-xs) var(--space-sm);
+    background: var(--bg-dark);
+    border-radius: var(--radius-sm);
+    color: var(--success);
+}
+
+.artifacts-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.artifact-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-md);
+    background: var(--bg-medium);
+    border-radius: var(--radius-md);
+    border-left: 4px solid var(--bg-light);
+}
+
+.artifact-card.tier-1 { border-color: #9ca3af; }
+.artifact-card.tier-2 { border-color: #22c55e; }
+.artifact-card.tier-3 { border-color: #a855f7; }
+.artifact-card.tier-4 { border-color: #f59e0b; }
+
+.artifact-icon {
+    font-size: 2rem;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-dark);
+    border-radius: var(--radius-md);
+}
+
+.artifact-info {
+    flex: 1;
+}
+
+.artifact-info h4 {
+    color: var(--text-primary);
+    margin-bottom: var(--space-xs);
+}
+
+.artifact-desc {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-bottom: var(--space-xs);
+}
+
+.artifact-stats {
+    display: flex;
+    gap: var(--space-sm);
+    font-size: 0.8rem;
+    color: var(--success);
+}
+
+.artifact-floor {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
+/* Lore */
+.lore-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.lore-card {
+    padding: var(--space-md);
+    background: var(--bg-medium);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.lore-card:hover {
+    background: var(--bg-light);
+}
+
+.lore-floor {
+    font-size: 0.8rem;
+    color: var(--accent);
+}
+
+.lore-card h4 {
+    color: var(--text-primary);
+    margin: var(--space-xs) 0;
+}
+
+.lore-preview {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.lore-floor-badge {
+    color: var(--accent);
+    margin-bottom: var(--space-lg);
+}
+
+.lore-text {
+    color: var(--text-secondary);
+    line-height: 1.8;
+}
+
+.lore-text p {
+    margin-bottom: var(--space-md);
+}
+
+/* Bosses List */
+.bosses-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.boss-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-md);
+    background: var(--bg-medium);
+    border-radius: var(--radius-md);
+}
+
+.boss-icon {
+    font-size: 2rem;
+}
+
+.boss-info h4 {
+    color: var(--danger);
+    margin-bottom: var(--space-xs);
+}
+
+.boss-info p {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+/* Floor Select Grid */
+.floor-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+    gap: var(--space-sm);
+    margin-top: var(--space-lg);
+}
+
+.floor-btn {
+    padding: var(--space-md);
+    background: var(--bg-medium);
+    border: 1px solid var(--bg-light);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.floor-btn:hover {
+    border-color: var(--primary);
+}
+
+.floor-btn.boss {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: var(--danger);
+}
+
+.floor-btn.current {
+    background: var(--primary);
+    border-color: var(--primary);
+}
+
+/* ================================
+   Combat Arena Styles
+================================ */
+.combat-arena {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.combat-monster,
+.combat-player {
+    padding: var(--space-lg);
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--bg-light);
+    margin-bottom: var(--space-md);
+    transition: var(--transition);
+}
+
+.combat-monster.defeated,
+.combat-player.defeated {
+    opacity: 0.5;
+}
+
+.monster-header,
+.player-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-md);
+}
+
+.monster-icon {
+    font-size: 2.5rem;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 3px solid;
+}
+
+.player-icon {
+    font-size: 2.5rem;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-medium);
+    border-radius: 50%;
+    border: 3px solid var(--accent);
+}
+
+.monster-info h3,
+.player-info h3 {
+    color: var(--text-primary);
+    margin-bottom: var(--space-xs);
+}
+
+.monster-type {
+    color: var(--danger);
+    font-size: 0.9rem;
+}
+
+.player-info p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.monster-hp {
+    margin-bottom: var(--space-md);
+}
+
+.hp-bar-container {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.hp-bar {
+    flex: 1;
+    height: 20px;
+    background: var(--bg-medium);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.monster-hp-bar .hp-fill {
+    background: linear-gradient(90deg, #dc2626, #ef4444);
+}
+
+.hp-fill {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.3s ease;
+}
+
+.hp-text {
+    min-width: 80px;
+    text-align: right;
+    color: var(--text-secondary);
+}
+
+.monster-stats,
+.player-stats {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-lg);
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.player-bars {
+    margin-bottom: var(--space-md);
+}
+
+.combat-bar-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-xs);
+    font-size: 0.9rem;
+}
+
+.combat-bar-row .bar-track {
+    height: 14px;
+}
+
+/* VS Divider */
+.combat-vs {
+    text-align: center;
+    padding: var(--space-md);
+}
+
+.combat-vs span:first-child {
+    font-size: 2rem;
+}
+
+.turn-indicator {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--accent);
+    margin-top: var(--space-xs);
+    font-weight: 600;
+}
+
+/* Combat Log */
+.combat-log {
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+    margin-bottom: var(--space-md);
+    max-height: 150px;
+    overflow-y: auto;
+    border: 1px solid var(--bg-light);
+}
+
+.log-line {
+    padding: var(--space-xs) 0;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    border-bottom: 1px solid var(--bg-light);
+}
+
+.log-line:last-child {
+    border-bottom: none;
+    color: var(--text-primary);
+}
+
+/* Combat Actions */
+.combat-actions {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-sm);
+}
+
+.combat-actions .btn-large {
+    grid-column: span 2;
+}
+
+.combat-actions .btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ================================
+   Dungeon Quick View (Dashboard)
+================================ */
+.dungeon-quick {
+    text-align: center;
+}
+
+.dq-level {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+}
+
+.dq-icon {
+    font-size: 2rem;
+}
+
+.dq-floor {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--accent);
+}
+
+.dq-stats {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-md);
+    color: var(--text-secondary);
+}
+
+/* ================================
+   Mobile Dungeon Styles
+================================ */
+@media (max-width: 768px) {
+    .dungeon-header {
+        flex-direction: column;
+        gap: var(--space-md);
+        text-align: center;
+    }
+    
+    .dungeon-stats {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .dungeon-tabs {
+        flex-wrap: wrap;
+    }
+    
+    .dtab {
+        flex: 1 1 calc(50% - var(--space-sm));
+    }
+    
+    .combat-actions {
+        grid-template-columns: 1fr;
+    }
+    
+    .combat-actions .btn-large {
+        grid-column: span 1;
+    }
+    
+    .floor-details {
+        flex-direction: column;
+        gap: var(--space-sm);
+    }
+}
