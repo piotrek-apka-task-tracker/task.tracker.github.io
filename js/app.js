@@ -9,6 +9,7 @@ const App = {
     init() {
         this.checkAuth();
         this.bindEvents();
+        this.setupAutoSave();
     },
 
     checkAuth() {
@@ -34,6 +35,16 @@ const App = {
             this.logout();
         });
 
+        // Settings button
+        document.getElementById('settings-btn').addEventListener('click', () => {
+            Auth.showAccountSettings();
+        });
+
+        // Leaderboard button
+        document.getElementById('leaderboard-btn').addEventListener('click', () => {
+            Auth.showLeaderboard();
+        });
+
         // Modal close on overlay click
         document.getElementById('modal-overlay').addEventListener('click', (e) => {
             if (e.target.id === 'modal-overlay') {
@@ -49,7 +60,22 @@ const App = {
         });
     },
 
+    setupAutoSave() {
+        // Save every 30 seconds
+        setInterval(() => {
+            Auth.saveUserData();
+        }, 30000);
+
+        // Save when leaving page
+        window.addEventListener('beforeunload', () => {
+            Auth.saveUserData();
+        });
+    },
+
     switchView(view) {
+        // Save data when switching views
+        Auth.saveUserData();
+        
         this.currentView = view;
 
         // Update nav buttons
@@ -119,7 +145,11 @@ const App = {
     showGameScreen() {
         document.getElementById('login-screen').classList.remove('active');
         document.getElementById('game-screen').classList.add('active');
-        document.getElementById('user-display').textContent = this.currentUser;
+        
+        // Get display name from users
+        const users = Auth.getUsers();
+        const displayName = users[this.currentUser]?.username || this.currentUser;
+        document.getElementById('user-display').textContent = displayName;
         
         // Initialize all modules
         Character.init();
@@ -135,6 +165,7 @@ const App = {
     },
 
     logout() {
+        Auth.saveUserData();
         localStorage.removeItem('questforge_current_user');
         this.currentUser = null;
         this.showLoginScreen();
@@ -181,14 +212,7 @@ const App = {
 
     // Save all data
     saveAllData() {
-        if (this.currentUser) {
-            const userData = {
-                character: Character.data,
-                tasks: Tasks.data,
-                dungeon: Dungeon.data
-            };
-            localStorage.setItem(`questforge_data_${this.currentUser}`, JSON.stringify(userData));
-        }
+        Auth.saveUserData();
     }
 };
 
