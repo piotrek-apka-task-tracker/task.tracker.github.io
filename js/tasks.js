@@ -174,15 +174,26 @@ const Tasks = {
             return;
         }
 
+        const meta = {
+            source: 'task',
+            taskId: task.id,
+            taskName: task.name,
+            category: task.category,
+            difficulty: task.difficulty,
+            isHabit: !!task.isHabit,
+            streak: task.isHabit ? task.streak : 0,
+            multiplier
+        };
+
         // Grant XP
-        Character.addExperience(xp);
+        Character.addExperience(xp, meta);
 
         // Grant stat experience
         const primaryStatXP = Math.floor(xp * 0.6);
         const secondaryStatXP = Math.floor(xp * 0.3);
 
-        Character.addStatExperience(task.statReward.primary, primaryStatXP);
-        Character.addStatExperience(task.statReward.secondary, secondaryStatXP);
+        Character.addStatExperience(task.statReward.primary, primaryStatXP, meta);
+        Character.addStatExperience(task.statReward.secondary, secondaryStatXP, meta);
 
         // Build notification message
         let message = `+${xp} XP`;
